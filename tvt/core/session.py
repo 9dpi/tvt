@@ -1,95 +1,114 @@
 """
-TVT - Tesla Visual Thinking
-Session Manager: lưu/tải phiên làm việc bằng SQLite
+TALKING WITH NIKOLA - Tesla Visual Thinking
+Session Manager: Quản lý danh tính người dùng và phiên làm việc (Offline-first / Local files)
 """
-import sqlite3
+import os
 import json
 import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 
+class TVTSessionManager:
+    def __init__(self, user_id: str = None):
+        # Đường dẫn mặc định ~/.tvt
+        self.tvt_dir = Path.home() / ".tvt"
+        self.identity_file = self.tvt_dir / "identity.json"
+        
+        # 1. Xác định User ID (UUID)
+        self.user_id = user_id or self._get_or_create_user_id()
+        
+        # 2. Cấu trúc thư mục user
+        self.user_dir = self.tvt_dir / "users" / self.user_id
+        self.sessions_dir = self.user_dir / "sessions"
+        
+        # Đảm bảo thư mục tồn tại
+        self.sessions_dir.mkdir(parents=True, exist_ok=True)
 
-DB_PATH = Path(__file__).parent.parent / "storage" / "sessions.db"
+    def _get_or_create_user_id(self) -> str:
+        """Đọc hoặc tạo UUID định danh người dùng cục bộ."""
+        if self.identity_file.exists():
+            try:
+                with open(self.identity_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    return data.get("user_id")
+            except:
+                pass
+        
+        # Nếu chưa có hoặc lỗi, tạo mới
+        self.tvt_dir.mkdir(parents=True, exist_ok=True)
+        new_id = str(uuid.uuid4())
+        with open(self.identity_file, "w", encoding="utf-8") as f:
+            json.dump({"user_id": new_id, "created_at": datetime.now().isoformat()}, f)
+        return new_id
 
+    def create_session(self, model_name: str) -> str:
+        """Tạo một phiên làm việc mới."""
+        session_id = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:4]}"
+        session_data = {
+            "id": session_id,
+            "model_name": model_name,
+            "status": "active",
+            "created_at": datetime.now().isoformat(),
+            "updated_at": datetime.now().isoformat(),
+            "data": {}
+        }
+        self.save_session(session_id, session_data)
+        return session_id
 
-def _get_conn() -> sqlite3.Connection:
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+    def save_session(self, session_id: str, data: dict):
+        """Lưu dữ liệu phiên vào file .json."""
+        file_path = self.sessions_dir / f"{session_id}.json"
+        data["updated_at"] = datetime.now().isoformat()
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
 
+    def load_session(self, session_id: str) -> Optional[dict]:
+        """Tải dữ liệu phiên từ file."""
+        file_path = self.sessions_dir / f"{session_id}.json"
+        if not file_path.exists():
+            return None
+        with open(file_path, "r", encoding="utf-8") as f:
+            return json.load(f)
 
-def init_db() -> None:
-    """Khởi tạo schema nếu chưa có."""
-    with _get_conn() as conn:
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS sessions (
-                id TEXT PRIMARY KEY,
-                model_name TEXT NOT NULL,
-                status TEXT NOT NULL DEFAULT 'active',
-                created_at TEXT NOT NULL,
-                updated_at TEXT NOT NULL,
-                data TEXT NOT NULL DEFAULT '{}'
-            )
-        """)
-        conn.commit()
+    def list_sessions(self, limit: int = 20) -> List[dict]:
+        """Liệt kê danh sách các phiên gần nhất."""
+        files = list(self.sessions_dir.glob("*.json"))
+        sessions = []
+        for f in files:
+            try:
+                with open(f, "r", encoding="utf-8") as f_in:
+                    sess = json.load(f_in)
+                    # Chỉ lấy metadata cho danh sách
+                    sessions.append({
+                        "id": sess["id"],
+                        "model_name": sess["model_name"],
+                        "status": sess["status"],
+                        "updated_at": sess["updated_at"]
+                    })
+            except:
+                continue
+        
+        # Sắp xếp theo thời gian cập nhật mới nhất
+        sessions.sort(key=lambda x: x["updated_at"], reverse=True)
+        return sessions[:limit]
 
+# Legacy procedural API wrappers to maintain compatibility with existing CLI code
+_mgr = TVTSessionManager()
 
 def create_session(model_name: str) -> str:
-    """Tạo session mới, trả về session_id."""
-    init_db()
-    session_id = str(uuid.uuid4())[:8]
-    now = datetime.now().isoformat()
-    with _get_conn() as conn:
-        conn.execute(
-            "INSERT INTO sessions (id, model_name, status, created_at, updated_at, data) VALUES (?,?,?,?,?,?)",
-            (session_id, model_name, "active", now, now, "{}")
-        )
-        conn.commit()
-    return session_id
-
+    return _mgr.create_session(model_name)
 
 def load_session(session_id: str) -> Optional[dict]:
-    """Tải session theo ID. Trả về None nếu không tồn tại."""
-    init_db()
-    with _get_conn() as conn:
-        row = conn.execute(
-            "SELECT * FROM sessions WHERE id = ?", (session_id,)
-        ).fetchone()
-    if row is None:
-        return None
-    result = dict(row)
-    result["data"] = json.loads(result["data"])
-    return result
-
+    return _mgr.load_session(session_id)
 
 def save_session(session_id: str, data: dict, status: str = "active") -> None:
-    """Cập nhật data + status của session."""
-    init_db()
-    now = datetime.now().isoformat()
-    with _get_conn() as conn:
-        conn.execute(
-            "UPDATE sessions SET data=?, status=?, updated_at=? WHERE id=?",
-            (json.dumps(data, ensure_ascii=False), status, now, session_id)
-        )
-        conn.commit()
+    full_data = _mgr.load_session(session_id) or {}
+    full_data.update({"data": data, "status": status})
+    _mgr.save_session(session_id, full_data)
 
+def list_sessions(limit: int = 20) -> list:
+    return _mgr.list_sessions(limit)
 
-def list_sessions(limit: int = 20) -> list[dict]:
-    """Liệt kê session gần nhất."""
-    init_db()
-    with _get_conn() as conn:
-        rows = conn.execute(
-            "SELECT id, model_name, status, created_at, updated_at FROM sessions ORDER BY updated_at DESC LIMIT ?",
-            (limit,)
-        ).fetchall()
-    return [dict(r) for r in rows]
-
-
-def export_session_json(session_id: str) -> Optional[str]:
-    """Xuất toàn bộ session ra JSON string."""
-    session = load_session(session_id)
-    if session is None:
-        return None
-    return json.dumps(session, ensure_ascii=False, indent=2)
+def get_user_id() -> str:
+    return _mgr.user_id

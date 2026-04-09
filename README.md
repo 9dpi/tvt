@@ -27,6 +27,15 @@
 
 ---
 
+## 🔒 Quyền riêng tư & Lưu trữ
+TVT tuân thủ nguyên tắc **tối đa quyền riêng tư**:
+- **Dữ liệu cục bộ**: Toàn bộ nội dung chat và phân tích được lưu trữ 100% trên thiết bị của bạn (trong `localStorage` cho bản Web hoặc thư mục `~/.tvt/` cho bản Python CLI). 
+- **Định danh ẩn danh**: TVT tự tạo một mã định danh ngẫu nhiên (UUID) để quản lý lịch sử phiên làm việc của bạn. Mã này không chứa thông tin cá nhân và **không bao giờ được gửi đi đâu**.
+- **Kiểm soát tuyệt đối**: Bạn có thể xóa lịch sử hoặc tệp định danh (`~/.tvt/identity.json`) bất cứ lúc nào để reset hoàn toàn.
+- **Không Tracking**: Không có bất kỳ công cụ theo dõi (tracker) nào được nhúng vào hệ thống.
+
+---
+
 ## 🧠 Các model tư duy
 
 | Model | Mô tả |
