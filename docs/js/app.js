@@ -30,7 +30,7 @@ const App = {
 
   welcomeText() {
     this.clearChat();
-    this.tvtSay('Xin chào! Tôi là **TVT (Tesla Visual Thinking)**.\n\n👉 Hãy chọn một **phương pháp tư duy** ở danh sách bên phải để chúng ta bắt đầu phân tích nhé!', false);
+    this.tvtSay('Xin chào! Tôi là **NIKOLA**. Tôi sẽ cùng bạn phân tích vấn đề theo phong cách Tư duy của Tesla.\n\n👉 Hãy chọn một **phương pháp tư duy** ở danh sách bên phải để chúng ta bắt đầu nhé!', false);
     this.setInputMode('disabled');
     document.getElementById('msg-input').placeholder = 'Chọn phương pháp bên phải...';
   },
