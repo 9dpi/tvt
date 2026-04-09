@@ -17,8 +17,11 @@ const App = {
     this.renderHistory();
     this.renderSettings();
     
-    // Welcome message if no session
-    if (!TVTCore.session) {
+    // Auto-resume last session if it exists in localStorage
+    const lastSessionId = localStorage.getItem('tvt_last_id');
+    if (lastSessionId) {
+      this.resumeSession(lastSessionId);
+    } else if (!TVTCore.session) {
       this.welcomeText();
     }
 
@@ -57,8 +60,12 @@ const App = {
     modelList.innerHTML = '';
 
     Object.entries(TVT_MODELS).forEach(([key, model]) => {
+      const active = TVTCore.session && TVTCore.session.modelName === key;
       const btn = document.createElement('button');
-      btn.className = 'model-btn';
+      btn.className = `model-btn ${active ? 'active' : ''}`;
+      if (active) btn.style.background = '#E5EFFD';
+      if (active) btn.style.borderColor = '#0054E3';
+      
       btn.dataset.model = key;
       btn.innerHTML = `<span class="model-icon">${model.icon}</span>
         <span class="model-info">
@@ -74,15 +81,23 @@ const App = {
   startSession(modelName) {
     TVTCore.createSession(modelName);
     TVTCore.session.aiProvider = this.provider.provider;
+    localStorage.setItem('tvt_last_id', TVTCore.session.id);
     this.clearChat();
     this.renderHistory();
+    this.renderModels(); // refresh to show active state
     this.startRound1();
   },
 
   resumeSession(id) {
     const sess = TVTCore.loadSession(id);
-    if (!sess) { this.showToast('Không tìm thấy phiên!'); return; }
-
+    if (!sess) { 
+      localStorage.removeItem('tvt_last_id');
+      this.welcomeText();
+      return; 
+    }
+    
+    localStorage.setItem('tvt_last_id', id);
+    this.renderModels(); // highlight active model
     this.clearChat();
 
     // Replay chat history
@@ -98,6 +113,16 @@ const App = {
       this.tvtSay('Phiên này đã hoàn thành! Dùng nút 💾 để tải kết quả.');
       this.setInputMode('done');
     }
+  },
+
+  highlightActiveModel(modelName) {
+    document.querySelectorAll('.model-btn').forEach(btn => {
+      if (btn.dataset.model === modelName) {
+        btn.classList.add('active-method');
+      } else {
+        btn.classList.remove('active-method');
+      }
+    });
   },
 
   // ─── Flow Logic ───────────────────────────────────────────────────────────
@@ -156,6 +181,7 @@ const App = {
   async startGenerating() {
     this.tvtSay('⚙️ _TVT đang tổng hợp giải pháp..._');
     this.setInputMode('disabled');
+    localStorage.removeItem('tvt_last_id'); // Session complete
     this.updateProgress(10, 'Đang xây dựng prompt giải pháp...');
 
     try {
