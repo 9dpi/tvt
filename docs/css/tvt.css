@@ -39,10 +39,10 @@ body {
 
 /* ── XP Window Shell ────────────────────────────────────────── */
 .xp-window {
-  width: 100%;
-  max-width: 900px;
+  width: 80%;
+  max-width: 1400px;
   height: 90vh;
-  max-height: 800px;
+  max-height: 900px;
   display: flex;
   flex-direction: column;
   background: var(--xp-bg);
