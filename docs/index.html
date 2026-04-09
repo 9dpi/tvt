@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TVT — Tesla Visual Thinking</title>
+  <meta name="description" content="Hệ thống tư duy có cấu trúc · Phong cách Tesla · Offline-first · Không cần server">
+  <meta name="theme-color" content="#1358c0">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="TVT — Tesla Visual Thinking">
+  <meta property="og:description" content="Hệ thống tư duy có cấu trúc. Phong cách Tesla. Miễn phí, offline-first.">
+  <meta property="og:url" content="https://9dpi.github.io/tvt/">
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/tvt.css">
+</head>
+
+<body>
+
+<!-- ════ XP Window Shell ════════════════════════════════════════ -->
+<div class="xp-window" id="main-window">
+
+  <!-- Title Bar -->
+  <div class="xp-titlebar" id="titlebar">
+    <span class="xp-title-icon">⚡</span>
+    <span class="xp-title-text" id="window-title">TVT — Tesla Visual Thinking</span>
+    <div class="xp-controls">
+      <button class="xp-btn" id="nav-history" title="Lịch sử">🗂</button>
+      <button class="xp-btn" id="nav-settings" title="Cài đặt AI">⚙</button>
+      <button class="xp-btn" id="nav-home" title="Trang chủ">🏠</button>
+      <button class="xp-btn close" id="btn-close" title="Đóng / Trang chủ">✕</button>
+    </div>
+  </div>
+
+  <!-- AI Status Bar -->
+  <div class="xp-statusbar">
+    <div class="status-dot checking" id="ai-status-dot"></div>
+    <span id="ai-status-text">Đang tìm AI...</span>
+    <span style="margin-left:auto;font-size:10px;color:#888" class="provider-label"></span>
+  </div>
+
+  <!-- ═══ HOME Screen ══════════════════════════════════════════ -->
+  <div class="screen" id="screen-home">
+
+    <div class="home-header">
+      <span class="home-logo">⚡</span>
+      <div class="home-title">Tesla Visual Thinking</div>
+      <div class="home-subtitle">Tư duy có cấu trúc · Offline-first · Miễn phí</div>
+    </div>
+
+    <div class="xp-divider"></div>
+
+    <div class="section-label">📋 Chọn phương pháp tư duy</div>
+    <div class="xp-panel">
+      <div id="model-list"></div>
+    </div>
+
+    <div class="xp-divider"></div>
+
+    <!-- Quick links -->
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <button class="xp-action-btn" id="nav-history" onclick="App.showScreen('history')">
+        📂 Lịch sử phiên
+      </button>
+      <button class="xp-action-btn" onclick="App.showScreen('settings')">
+        ⚙️ Cài đặt AI
+      </button>
+    </div>
+
+    <!-- Ollama quick-start hint -->
+    <div style="background:#FFF8E1;border:1px solid #FFE082;padding:8px;border-radius:2px;font-size:11px;color:#555;line-height:1.6">
+      💡 <strong>Offline 100%:</strong> Cài
+      <a href="https://ollama.com" target="_blank" style="color:var(--accent)">Ollama</a>
+      + chạy <code style="background:#f4f4f4;padding:1px 4px;border:1px solid #ddd">ollama run gemma3</code>
+      để dùng AI hoàn toàn cục bộ.<br>
+      Hoặc cài đặt API key miễn phí của
+      <a href="https://aistudio.google.com" target="_blank" style="color:var(--accent)">Gemini</a> /
+      <a href="https://console.groq.com" target="_blank" style="color:var(--accent)">Groq</a>.
+    </div>
+
+  </div><!-- /screen-home -->
+
+
+  <!-- ═══ CHAT Screen ══════════════════════════════════════════ -->
+  <div class="screen" id="screen-chat">
+
+    <!-- Chat header (like Yahoo IM header) -->
+    <div class="chat-header">
+      <div class="chat-avatar">⚡</div>
+      <div class="chat-header-info">
+        <div class="chat-header-name" id="window-title-chat">TVT : Bạn — Phiên tư duy</div>
+        <div class="chat-header-sub provider-label">AI đang kiểm tra...</div>
+      </div>
+      <div class="chat-toolbar">
+        <button class="chat-tool-btn" id="btn-download-json" title="Tải JSON">💾</button>
+        <button class="chat-tool-btn" id="btn-download-md"   title="Tải Markdown">📄</button>
+      </div>
+    </div>
+
+    <div class="xp-divider"></div>
+
+    <!-- Message display area -->
+    <div class="chat-messages-wrapper">
+      <div id="chat-messages" role="log" aria-live="polite" aria-label="Nội dung trò chuyện">
+        <!-- Messages injected here -->
+      </div>
+    </div>
+
+    <!-- Input area -->
+    <div class="chat-input-area">
+      <div class="input-hint-row">
+        <span id="input-hint"></span>
+      </div>
+
+      <textarea
+        id="msg-input"
+        placeholder="Nhập câu trả lời..."
+        rows="3"
+        aria-label="Nhập tin nhắn"
+        autocomplete="off"
+        spellcheck="true"
+      ></textarea>
+
+      <div class="chat-bottom-bar">
+        <label class="sound-label">
+          <input type="checkbox" id="sound-check">
+          Sound
+        </label>
+
+        <button id="send-btn" type="button" aria-label="Gửi">
+          <span class="send-icon">📤</span>
+          <span>Send</span>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /screen-chat -->
+
+
+  <!-- ═══ HISTORY Screen ═══════════════════════════════════════ -->
+  <div class="screen" id="screen-history">
+    <div class="screen-title">📂 Lịch sử phiên làm việc</div>
+
+    <div id="history-list">
+      <!-- Rendered by App.renderHistory() -->
+    </div>
+
+    <div style="margin-top:auto">
+      <button class="xp-action-btn" onclick="App.showScreen('home')">◀ Quay lại</button>
+    </div>
+  </div>
+
+
+  <!-- ═══ SETTINGS Screen ══════════════════════════════════════ -->
+  <div class="screen" id="screen-settings">
+    <div class="screen-title">⚙️ Cài đặt AI Provider</div>
+
+    <!-- Auto-detect status -->
+    <div class="settings-group">
+      <div class="settings-group-title">🔍 Trạng thái phát hiện tự động</div>
+      <div class="provider-priority">
+        <div class="p-item">🖥️ <span>Ollama (local)</span>     <span class="p-badge local">Ưu tiên 1 · Hoàn toàn offline</span></div>
+        <div class="p-item">🌐 <span>Chrome AI (Nano)</span>  <span class="p-badge">Ưu tiên 2 · Built-in</span></div>
+        <div class="p-item">✨ <span>Gemini API</span>        <span class="p-badge">Ưu tiên 3 · Free tier</span></div>
+        <div class="p-item">⚡ <span>Groq API</span>          <span class="p-badge">Ưu tiên 4 · Free tier</span></div>
+        <div class="p-item">🔀 <span>OpenRouter</span>        <span class="p-badge">Ưu tiên 5 · Free models</span></div>
+        <div class="p-item">📴 <span>Offline (rule-based)</span><span class="p-badge active">Fallback luôn hoạt động</span></div>
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:#555">
+        Hiện tại: <strong class="provider-label">Đang kiểm tra...</strong>
+      </div>
+    </div>
+
+    <!-- Gemini config -->
+    <div class="settings-group">
+      <div class="settings-group-title">✨ Google Gemini (Free tier)</div>
+      <div class="settings-row">
+        <label class="settings-label">API Key</label>
+        <input class="settings-input" id="cfg-gemini-key" type="password" placeholder="AIza...">
+        <span class="settings-note">
+          Lấy miễn phí tại
+          <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a>
+        </span>
+      </div>
+      <div class="settings-row">
+        <label class="settings-label">Model</label>
+        <input class="settings-input" id="cfg-gemini-model" placeholder="gemini-2.0-flash">
+      </div>
+    </div>
+
+    <!-- Groq config -->
+    <div class="settings-group">
+      <div class="settings-group-title">⚡ Groq (Free tier — cực nhanh)</div>
+      <div class="settings-row">
+        <label class="settings-label">API Key</label>
+        <input class="settings-input" id="cfg-groq-key" type="password" placeholder="gsk_...">
+        <span class="settings-note">
+          Lấy miễn phí tại
+          <a href="https://console.groq.com" target="_blank">console.groq.com</a>
+        </span>
+      </div>
+    </div>
+
+    <!-- OpenRouter -->
+    <div class="settings-group">
+      <div class="settings-group-title">🔀 OpenRouter (Free models)</div>
+      <div class="settings-row">
+        <label class="settings-label">API Key</label>
+        <input class="settings-input" id="cfg-openrouter-key" type="password" placeholder="sk-or-...">
+        <span class="settings-note">
+          Lấy tại <a href="https://openrouter.ai" target="_blank">openrouter.ai</a>
+          · Dùng model Llama 3.2 3B (free)
+        </span>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="xp-action-btn primary" id="btn-save-settings">💾 Lưu cài đặt</button>
+      <button class="xp-action-btn" id="btn-test-ai">🔍 Kiểm tra AI</button>
+      <button class="xp-action-btn" onclick="App.showScreen('home')">◀ Quay lại</button>
+    </div>
+
+  </div><!-- /screen-settings -->
+
+</div><!-- /xp-window -->
+
+<!-- Toast notification -->
+<div id="toast" role="alert" aria-live="assertive"></div>
+
+<!-- Scripts — order matters -->
+<script src="js/models.js"></script>
+<script src="js/ai-providers.js"></script>
+<script src="js/tvt-core.js"></script>
+<script src="js/app.js"></script>
+<script>
+  // Register Service Worker for offline-first
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
+</script>
+
+</body>
+</html>

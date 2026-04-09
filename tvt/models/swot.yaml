@@ -1,0 +1,72 @@
+name: "SWOT"
+description: "Phân tích Strengths, Weaknesses, Opportunities, Threats"
+version: "1.0"
+applicable_for: ["kinh doanh", "chiến lược", "dự án", "cá nhân"]
+max_rounds: 3
+
+initial_questions:
+  - id: "context"
+    text: "Bạn đang phân tích điều gì? (sản phẩm, dự án, tổ chức, cá nhân?)"
+    min_words: 10
+    hint: "Cụ thể càng tốt — tên, lĩnh vực, giai đoạn phát triển"
+  - id: "strengths"
+    text: "Strengths — Điểm mạnh nội tại là gì?"
+    min_words: 15
+    hint: "Nguồn lực, kỹ năng, lợi thế cạnh tranh bạn đang có"
+  - id: "weaknesses"
+    text: "Weaknesses — Điểm yếu nội tại là gì?"
+    min_words: 15
+    hint: "Hạn chế, thiếu sót, điều cần cải thiện"
+  - id: "opportunities"
+    text: "Opportunities — Cơ hội bên ngoài nào đang mở ra?"
+    min_words: 15
+    hint: "Xu hướng thị trường, nhu cầu chưa được đáp ứng, khoảng trống"
+  - id: "threats"
+    text: "Threats — Mối đe dọa bên ngoài là gì?"
+    min_words: 15
+    hint: "Đối thủ, rủi ro, thay đổi môi trường bất lợi"
+
+analysis_prompt_template: |
+  Bạn là TVT (Tesla Visual Thinking) — tư duy chiến lược, thực tế, phong cách Tesla.
+
+  Người dùng đang phân tích SWOT cho: {context}
+
+  Strengths: {strengths}
+  Weaknesses: {weaknesses}
+  Opportunities: {opportunities}
+  Threats: {threats}
+
+  Hãy:
+  1. Tóm tắt bức tranh tổng thể trong 2-3 câu.
+  2. Chỉ ra điểm mơ hồ hoặc mâu thuẫn nội tại (nếu có).
+  3. Đề xuất 2-3 câu hỏi làm rõ (nếu cần).
+  4. Đề xuất nhiệm vụ tự tìm kiếm: ví dụ "so sánh với 3 đối thủ trực tiếp", "phỏng vấn 5 khách hàng tiềm năng".
+
+  Trả lời CHÍNH XÁC bằng JSON hợp lệ:
+  {
+    "summary": "...",
+    "ambiguities": ["...", "..."],
+    "follow_up_questions": ["...", "..."],
+    "self_research_task": "..."
+  }
+
+solution_generation_prompt: |
+  Bạn là TVT (Tesla Visual Thinking). Dựa trên phân tích SWOT:
+
+  - Tổng quan: {problem_summary}
+  - Nghiên cứu thực tế của user: {user_research_findings}
+  - Bổ sung: {additional_answers}
+
+  Hãy đề xuất 3 chiến lược hành động cụ thể:
+  1. SO Strategy (dùng Strengths khai thác Opportunities)
+  2. WO Strategy (khắc phục Weaknesses để nắm Opportunities)
+  3. ST/WT Strategy (phòng thủ hoặc tái định vị)
+
+  Mỗi chiến lược: tên, mô tả, bước đi cụ thể, rủi ro tiềm ẩn theo tư duy Tesla.
+
+quick_solution_prompt: |
+  Bạn là TVT (Tesla Visual Thinking). Dựa trên tổng quan SWOT: {problem_summary}
+
+  ⚠️ Thiếu dữ liệu nghiên cứu thực tế. Giải pháp mang tính lý thuyết.
+
+  Đề xuất 3 hướng chiến lược khả thi với phân tích điểm mạnh/yếu. Khuyến nghị kiểm chứng thực tế.

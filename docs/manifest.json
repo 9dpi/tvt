@@ -1,0 +1,20 @@
+{
+  "name": "TVT — Tesla Visual Thinking",
+  "short_name": "TVT",
+  "description": "Hệ thống tư duy có cấu trúc · Offline-first · Miễn phí",
+  "start_url": "/tvt/",
+  "scope": "/tvt/",
+  "display": "standalone",
+  "background_color": "#6e8fc9",
+  "theme_color": "#1358c0",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["productivity", "education"],
+  "lang": "vi"
+}

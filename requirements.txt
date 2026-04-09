@@ -1,0 +1,20 @@
+# TVT — Tesla Visual Thinking
+# Dependencies
+
+# Core
+typer[all]>=0.12.0
+rich>=13.7.0
+pyyaml>=6.0
+python-dotenv>=1.0.0
+
+# Web UI
+streamlit>=1.35.0
+
+# LLM Clients (cài thêm theo provider bạn dùng)
+# Uncomment dòng tương ứng:
+# openai>=1.30.0           # Dùng với TVT_PROVIDER=openai
+google-generativeai>=0.8.0   # Dùng với TVT_PROVIDER=gemini (mặc định)
+# anthropic>=0.28.0        # Dùng với TVT_PROVIDER=claude
+
+# Storage
+# sqlite3 is built-in with Python — không cần cài thêm

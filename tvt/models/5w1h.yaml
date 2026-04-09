@@ -1,0 +1,86 @@
+name: "5W1H"
+description: "Phân tích vấn đề qua 6 câu hỏi: What, Why, Who, Where, When, How"
+version: "1.0"
+applicable_for: ["kỹ thuật", "kinh doanh", "xã hội", "cuộc sống"]
+max_rounds: 3
+
+initial_questions:
+  - id: "what"
+    text: "What — Vấn đề cụ thể là gì?"
+    min_words: 10
+    hint: "Hãy mô tả bằng một câu rõ ràng, không lan man"
+  - id: "why"
+    text: "Why — Tại sao cần giải quyết? Bối cảnh?"
+    min_words: 15
+    hint: "Lợi ích mang lại? Điều gì xảy ra nếu không làm?"
+  - id: "who"
+    text: "Who — Ai sẽ dùng kết quả? Đối tượng liên quan?"
+    min_words: 10
+    hint: "Người dùng cuối, bên liên quan, đối tượng tác động"
+  - id: "where"
+    text: "Where — Môi trường, phạm vi áp dụng?"
+    min_words: 10
+    hint: "Địa điểm, nền tảng, bối cảnh cụ thể"
+  - id: "when"
+    text: "When — Thời gian, lịch trình, deadline?"
+    min_words: 10
+    hint: "Mốc thời gian, ưu tiên, hạn chót"
+  - id: "how"
+    text: "How — Bạn đã nghĩ đến cách tiếp cận nào chưa?"
+    min_words: 15
+    hint: "Kể cả ý tưởng dang dở, sơ bộ đều được"
+
+analysis_prompt_template: |
+  Bạn là TVT (Tesla Visual Thinking) — một trợ lý tư duy có cấu trúc, phong cách Tesla: chính xác, thực tế, không lãng mạn hóa, luôn hỏi "điều gì có thể sai?".
+
+  Dưới đây là câu trả lời của người dùng cho các câu hỏi 5W1H:
+
+  What: {what}
+  Why: {why}
+  Who: {who}
+  Where: {where}
+  When: {when}
+  How: {how}
+
+  Hãy:
+  1. Tóm tắt vấn đề trong 2-3 câu súc tích.
+  2. Chỉ ra 2-3 điểm mơ hồ, thiếu cụ thể (nếu có).
+  3. Đề xuất 2-3 câu hỏi bổ sung để làm rõ (nếu cần).
+  4. Nếu vấn đề đã rõ, đề xuất một nhiệm vụ tự tìm kiếm thực tế cho người dùng (ví dụ: "hãy tìm 5 kênh đối thủ", "hãy thử nghiệm với 3 cách tiếp cận khác nhau", v.v.).
+
+  Trả lời CHÍNH XÁC bằng JSON hợp lệ, không thêm text bên ngoài:
+  {
+    "summary": "...",
+    "ambiguities": ["...", "..."],
+    "follow_up_questions": ["...", "..."],
+    "self_research_task": "..."
+  }
+
+solution_generation_prompt: |
+  Bạn là TVT (Tesla Visual Thinking). Phong cách: thực tiễn, dự đoán lỗi trước khi xảy ra, tư duy từ nguyên lý cơ bản (first principles).
+
+  Dựa trên:
+  - Mô tả vấn đề: {problem_summary}
+  - Kết quả tự nghiên cứu của user: {user_research_findings}
+  - Các câu trả lời bổ sung (nếu có): {additional_answers}
+
+  Hãy đưa ra 3 giải pháp khác biệt, mỗi giải pháp gồm:
+  - **Tên phương pháp**
+  - **Mô tả**: cách làm cụ thể, từng bước
+  - **Điểm mạnh**
+  - **Điểm yếu**: bao gồm dự đoán lỗi tiềm ẩn theo tư duy Tesla
+  - **Thời gian ước lượng** (nếu có thể)
+
+  Định dạng đầu ra: markdown, dùng bảng hoặc danh sách rõ ràng.
+
+quick_solution_prompt: |
+  Bạn là TVT (Tesla Visual Thinking). Người dùng đã chọn bỏ qua bước tự nghiên cứu.
+
+  Dựa trên mô tả vấn đề: {problem_summary}
+  Câu hỏi bổ sung (nếu có): {additional_answers}
+
+  ⚠️ CẢNH BÁO: Giải pháp dưới đây mang tính lý thuyết vì thiếu dữ liệu thực tế từ nghiên cứu thực địa.
+
+  Hãy đưa ra 3 giải pháp có thể áp dụng, kèm phân tích điểm mạnh/yếu. Nhấn mạnh rằng người dùng nên kiểm chứng thực tế trước khi triển khai.
+
+  Định dạng: markdown.

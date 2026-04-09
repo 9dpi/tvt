@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "tvt"
+version = "0.1.0"
+description = "Tesla Visual Thinking — Hệ thống tư duy có cấu trúc"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "TVT Team" }]
+keywords = ["thinking", "AI", "problem-solving", "structured-thinking"]
+
+dependencies = [
+    "typer[all]>=0.12.0",
+    "rich>=13.7.0",
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0.0",
+    "streamlit>=1.35.0",
+    "google-generativeai>=0.8.0",
+]
+
+[project.optional-dependencies]
+openai = ["openai>=1.30.0"]
+claude = ["anthropic>=0.28.0"]
+dev = ["pytest>=8.0", "black>=24.0", "ruff>=0.4.0"]
+
+[project.scripts]
+tvt = "tvt.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["tvt*"]
+
+[tool.setuptools.package-data]
+tvt = ["models/*.yaml"]
