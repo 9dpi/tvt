@@ -121,8 +121,16 @@ const App = {
     if (sess.phase === 'round1') {
       const q = TVTCore.getCurrentQuestion();
       if (q) this.askQuestion(q.question, q.index, q.total);
+    } else if (sess.phase === 'round1b') {
+      this.askFollowup();
+    } else if (sess.phase === 'round2') {
+      this.startRound2();
+    } else if (sess.phase === 'generating' || sess.phase === 'analyzing') {
+       this.tvtSay('⚙️ _Đang tiếp tục xử lý..._');
+       if (sess.phase === 'analyzing') this.runAnalysis();
+       else this.startGenerating();
     } else if (sess.phase === 'done') {
-      this.tvtSay('Phiên này đã hoàn thành! Dùng nút 💾 để tải kết quả.');
+      this.tvtSay('Phiên này đã hoàn thành!');
       this.setInputMode('done');
     }
   },
