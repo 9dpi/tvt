@@ -103,7 +103,9 @@ const AI_PROVIDERS = {
       case 'gemini':    return await this._callGemini(prompt);
       case 'groq':      return await this._callGroq(prompt);
       case 'openrouter':return await this._callOpenRouter(prompt);
-      case 'offline':   return this._offlineAnalysis(prompt);
+      case 'offline':   
+        if (prompt.includes('JSON')) return this._offlineAnalysis(prompt);
+        return this._offlineSolution(prompt);
       default: throw new Error('Unknown provider: ' + providerInfo.provider);
     }
   },
@@ -191,28 +193,56 @@ const AI_PROVIDERS = {
    * Offline rule-based analysis — no AI needed, deterministic
    */
   _offlineAnalysis(prompt) {
-    // Extract answers from the prompt context (passed via window)
     const ctx = window._tvtCurrentAnswers || {};
     const allText = Object.values(ctx).join(' ').toLowerCase();
     const wordCount = allText.split(/\s+/).filter(Boolean).length;
+    const topic = Object.values(ctx)[0] || "vấn đề";
+    const shortTopic = topic.substring(0, 40) + (topic.length > 40 ? '...' : '');
 
-    // Detect potential ambiguities by keyword analysis
+    // Rule-based logic for offline mode
     const ambiguities = [];
-    const vague = ['nhiều', 'một số', 'có thể', 'khoảng', 'tương đối', 'chắc là', 'dự kiến'];
-    vague.forEach(v => { if (allText.includes(v)) ambiguities.push(`Cụm "${v}" cần định lượng cụ thể hơn`); });
-    if (ambiguities.length === 0) ambiguities.push('Bổ sung dữ liệu định lượng (số liệu, tỷ lệ, mốc thời gian cụ thể)');
+    if (allText.length < 50) ambiguities.push("Thông tin mô tả còn quá ngắn, chưa đủ cơ sở để tối ưu.");
+    if (!allText.match(/\d/)) ambiguities.push("Thiếu các con số định lượng (số lượng, ngân sách, nhân sự).");
+    if (!allText.includes('giờ') && !allText.includes('ngày') && !allText.includes('tuần')) ambiguities.push("Thiếu mốc thời gian hoặc deadline cụ thể.");
+    if (ambiguities.length === 0) ambiguities.push("Cần kiểm chứng tính khả thi của các giả định kỹ thuật.");
 
-    const topicWords = Object.values(ctx)[0]?.split(' ').slice(0, 5).join(' ') || 'vấn đề này';
-    
     return JSON.stringify({
-      summary: `[Phân tích offline] Bạn đang xử lý vấn đề: "${topicWords}..." với ${wordCount} từ mô tả. TVT ghi nhận đầy đủ 6 chiều phân tích. Độ chi tiết: ${wordCount > 80 ? 'tốt' : 'cần bổ sung thêm'}.`,
+      summary: `[Chế độ Offline] Vấn đề "${shortTopic}" đã được ghi nhận với ${wordCount} từ. NIKOLA nhận thấy các dữ liệu cốt lõi đã hình thành nhưng cần làm rõ thêm các chi tiết thực tế.`,
       ambiguities: ambiguities.slice(0, 3),
       follow_up_questions: [
-        `Bạn có thể đo lường thành công của "${topicWords}" bằng con số cụ thể nào?`,
-        'Có yếu tố rủi ro nào bạn chưa đề cập đến trong mô tả?'
+        `Mục tiêu quan trọng nhất mà bạn muốn đạt được với "${shortTopic}" là gì?`,
+        "Kết quả thế nào được coi là thành công mỹ mãn?"
       ],
-      self_research_task: `Tìm 3-5 ví dụ thực tế (case study) về "${topicWords}" và ghi lại điểm mạnh/yếu của mỗi ví dụ.`
+      self_research_task: `Thử tìm 3 nguyên nhân khiến "${shortTopic}" có thể thất bại (Pre-mortem) và liệt kê chúng.`
     });
+  },
+
+  _offlineSolution(prompt) {
+    const ctx = window._tvtCurrentAnswers || {};
+    const topic = Object.values(ctx)[0] || "vấn đề của bạn";
+    const shortTopic = topic.substring(0, 80);
+    
+    return `### ⚡ GIẢI PHÁP ĐỀ XUẤT (OFFLINE)
+  
+  Dựa trên các thông tin về: **"${shortTopic}"**, NIKOLA cung cấp khung giải pháp theo tư duy Tesla:
+  
+  **1. Giải pháp Tối giản (Occam's Razor)**
+  - **Mô tả**: Loại bỏ tất cả các bước trung gian không cần thiết. Chỉ tập trung vào chức năng cốt lõi nhất.
+  - **Điểm mạnh**: Nhanh, rẻ, ít rủi ro kỹ thuật.
+  - **Rủi ro**: Có thể thiếu tính thẩm mỹ hoặc trải nghiệm người dùng cao cấp.
+  
+  **2. Giải pháp Tự động hóa (Automation First)**
+  - **Mô tả**: Thiết lập quy trình để hệ thống tự vận hành mà không cần sự can thiệp liên tục của bạn.
+  - **Điểm mạnh**: Giải phóng thời gian, đảm bảo tính nhất quán.
+  - **Rủi ro**: Mất thời gian cài đặt ban đầu và cần bảo trì.
+  
+  **3. Giải pháp Đột phá (First Principles)**
+  - **Mô tả**: Coi như bạn bắt đầu lại từ con số 0. Nếu không có các công cụ hiện tại, bạn sẽ làm gì?
+  - **Điểm mạnh**: Tạo ra sự khác biệt hoàn toàn với đối thủ hoặc cách làm cũ.
+  - **Rủi ro**: Đòi hỏi nhiều năng lượng và sự kiên trì.
+  
+  ---
+  ⚠️ *Lưu ý: Để có giải pháp chi tiết và sáng tạo hơn từ Gemini/Llama, vui lòng dán **API Key** vào mục Cài đặt AI bên phải.*`;
   },
 
   /**
