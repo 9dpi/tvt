@@ -92,6 +92,7 @@ const App = {
       // Keep everything, just re-ask the current question of the new model
       this.renderModels();
       this.askNextQuestion();
+      document.querySelector('.xp-window').classList.remove('show-menu');
       return;
     }
 
@@ -102,6 +103,7 @@ const App = {
     this.renderHistory();
     this.renderModels(); // refresh to show active state
     this.startRound1();
+    document.querySelector('.xp-window').classList.remove('show-menu');
   },
 
   resumeSession(id) {
@@ -137,6 +139,7 @@ const App = {
       this.tvtSay('Phiên này đã hoàn thành!');
       this.setInputMode('done');
     }
+    document.querySelector('.xp-window').classList.remove('show-menu');
   },
 
   highlightActiveModel(modelName) {
@@ -556,6 +559,11 @@ const App = {
 
   // ─── Event Binding ────────────────────────────────────────────────────────
   bindEvents() {
+    // Mobile menu toggle
+    document.getElementById('btn-mobile-menu')?.addEventListener('click', () => {
+      document.querySelector('.xp-window').classList.toggle('show-menu');
+    });
+
     // Top right save & new chat buttons
     document.getElementById('btn-new-chat')?.addEventListener('click', () => this.newChat());
     document.getElementById('btn-download-json')?.addEventListener('click', () => {
