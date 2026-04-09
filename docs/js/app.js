@@ -9,8 +9,12 @@ const App = {
 
   // ─── Init ─────────────────────────────────────────────────────────────────
   async init() {
-    AI_PROVIDERS.init();
     this.bindEvents();
+    
+    // Check for insecure context (file:// or non-localhost/https)
+    if (window.location.protocol === 'file:') {
+      this.tvtSay('⚠️ **CẢNH BÁO: Bạn đang mở tệp trực tiếp từ máy tính (file://).**\n\nTrình duyệt sẽ **ngăn chặn** việc tìm AI cục bộ (Ollama) và các API bảo mật vì lý do an toàn.\n\n👉 Để ứng dụng chạy tốt nhất, hãy dùng địa chỉ: [**http://localhost:8502**](http://localhost:8502)', false);
+    }
     
     // Render all side panels
     this.renderModels();
