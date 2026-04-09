@@ -345,6 +345,16 @@ body {
 }
 #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+/* Animation for Auto-Onboarding */
+.flash-input {
+  animation: flashInput 1.5s infinite;
+  background: #FFFFF0 !important;
+}
+@keyframes flashInput {
+  0%, 100% { border-color: #85837A #FFFFFF #FFFFFF #85837A; box-shadow: inset 1px 1px 0 #0D0D0D; }
+  50% { border-color: #0054E3; box-shadow: 0 0 8px #0054E3; }
+}
+
 /* ── Scrollbars inside pane ──────────────────────────────────── */
 .xp-side-panel::-webkit-scrollbar { width: 12px; }
 .xp-side-panel::-webkit-scrollbar-track { background: #638DDE; }

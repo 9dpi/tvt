@@ -112,8 +112,18 @@ const App = {
     // Proactive onboarding if offline
     if (this.provider?.provider === 'offline') {
       setTimeout(() => {
-        this.tvtSay(`💡 **Mẹo:** Bạn đang dùng chế độ **Offline (Hạn chế)**. Để NIKOLA kể chuyện và phân tích "thông minh" hơn, hãy [**bấm vào đây để lấy mã Groq miễn phí**](https://console.groq.com/keys) và dán vào bảng bên phải nhé! (Chỉ mất 10 giây)`, false);
-      }, 2000);
+        this.tvtSay(`💡 **Mẹo:** NIKOLA đang chạy Offline (Hạn chế). Để có kết quả phân tích tốt nhất từ Cloud AI, hãy **[bấm vào đây để lấy mã Groq miễn phí](https://console.groq.com/keys)** (mở tab mới), sau đó quay lại dán vào ô đang nhấp nháy bên phải nhé!`, false);
+        this.highlightAPIInput();
+      }, 2500);
+    }
+  },
+
+  highlightAPIInput() {
+    const input = document.getElementById('cfg-groq-key');
+    if (input) {
+      input.classList.add('flash-input');
+      setTimeout(() => input.classList.remove('flash-input'), 5000);
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   },
 
