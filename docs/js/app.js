@@ -156,15 +156,23 @@ const App = {
   async startGenerating() {
     this.tvtSay('⚙️ _TVT đang tổng hợp giải pháp..._');
     this.setInputMode('disabled');
+    this.updateProgress(10, 'Đang xây dựng prompt giải pháp...');
 
     try {
       const prompt = TVTCore.buildSolutionPrompt();
+      this.updateProgress(30, 'Đang gửi dữ liệu đến AI...');
+      
       const solutions = await AI_PROVIDERS.call(prompt, this.provider);
+      this.updateProgress(90, 'Đang hoàn tất kết quả...');
+      
       TVTCore.session.solutions = solutions;
       TVTCore.session.phase = 'done';
       TVTCore.session.status = 'completed';
       TVTCore._save();
       this.renderHistory();
+
+      this.updateProgress(100, 'Xong!');
+      setTimeout(() => this.updateProgress(-1), 1000);
 
       if (TVTCore.session.skippedResearch) {
         this.tvtSay('⚠️ _Giải pháp dưới đây mang tính lý thuyết do bỏ qua nghiên cứu thực tế._');
@@ -181,14 +189,22 @@ const App = {
   async runAnalysis() {
     this.tvtSay('🤖 _TVT đang phân tích..._');
     this.setInputMode('disabled');
+    this.updateProgress(10, 'Đang chuẩn bị dữ liệu đầu vào...');
 
     try {
       const prompt = TVTCore.buildAnalysisPrompt();
+      this.updateProgress(40, 'AI đang đọc nội dung...');
+      
       const raw = await AI_PROVIDERS.call(prompt, this.provider);
+      this.updateProgress(70, 'Đang xử lý kết quả phân tích...');
+      
       const analysis = AI_PROVIDERS.parseJSON(raw);
       TVTCore.session.analysis = analysis;
       TVTCore.session.phase = 'round1b';
       TVTCore._save();
+
+      this.updateProgress(100, 'Hoàn thành!');
+      setTimeout(() => this.updateProgress(-1), 1000);
 
       this.tvtSay(`📊 **Tóm tắt vấn đề của bạn:**\n${analysis.summary}`);
 
@@ -252,6 +268,23 @@ const App = {
   clearChat() {
     const chat = document.getElementById('chat-messages');
     if (chat) chat.innerHTML = '';
+  },
+
+  // percentage 0-100, -1 to hide
+  updateProgress(percent, label = '') {
+    const box = document.getElementById('progress-box');
+    const bar = document.getElementById('progress-bar');
+    const txt = document.getElementById('progress-text');
+    if (!box || !bar) return;
+
+    if (percent < 0) {
+      box.style.display = 'none';
+      return;
+    }
+
+    box.style.display = 'flex';
+    bar.style.width = percent + '%';
+    if (label) txt.textContent = label;
   },
 
   setInputMode(mode) {

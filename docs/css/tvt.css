@@ -294,6 +294,48 @@ body {
 /* ── Utilities ───────────────────────────────────────────────── */
 .xp-divider { height: 1px; background: linear-gradient(90deg, var(--xp-border), transparent); border-top: 1px solid #FAFAF8; margin: 0; }
 
+/* ── Progress Bar (XP Style) ────────────────────────────────── */
+.xp-progress-container {
+  display: none;
+  background: #FFF;
+  border: 1px solid #7B9EBD;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 2px;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+}
+.xp-progress-label {
+  font-size: 11px;
+  font-weight: bold;
+  color: #0033CC;
+}
+.xp-progress-track {
+  height: 16px;
+  background: white;
+  border: 1px solid #ACA899;
+  position: relative;
+  overflow: hidden;
+}
+.xp-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(180deg, #31E431 0%, #209920 50%, #157915 51%, #23B423 100%);
+  transition: width 0.3s ease;
+  display: flex;
+  gap: 2px;
+  padding: 1px;
+}
+/* Classic XP chunks effect */
+.xp-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: linear-gradient(90deg, transparent 0, transparent 8px, white 8px, white 10px);
+  background-size: 10px 100%;
+}
+
 #toast {
   position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(60px);
   background: #1a1a1a; color: white; padding: 8px 18px; border-radius: 4px; font-size: 12px; z-index: 9999; opacity: 0; transition: all 0.3s; box-shadow: 0 4px 16px rgba(0,0,0,0.5);
