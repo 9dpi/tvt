@@ -1,6 +1,6 @@
 /**
  * TVT App — Main UI Controller
- * Yahoo Messenger / Windows XP IM style
+ * Two-panel layout (Chat + Task Pane)
  */
 
 const App = {
@@ -11,8 +11,25 @@ const App = {
   async init() {
     AI_PROVIDERS.init();
     this.bindEvents();
-    this.showScreen('home');
+    
+    // Render all side panels
+    this.renderModels();
+    this.renderHistory();
+    this.renderSettings();
+    
+    // Welcome message if no session
+    if (!TVTCore.session) {
+      this.welcomeText();
+    }
+
     await this.detectAI();
+  },
+
+  welcomeText() {
+    this.clearChat();
+    this.tvtSay('Xin chào! Tôi là **TVT (Tesla Visual Thinking)**.\n\n👉 Hãy chọn một **phương pháp tư duy** ở danh sách bên phải để chúng ta bắt đầu phân tích nhé!', false);
+    this.setInputMode('disabled');
+    document.getElementById('msg-input').placeholder = 'Chọn phương pháp bên phải...';
   },
 
   async detectAI() {
@@ -26,35 +43,15 @@ const App = {
     if (dotEl) {
       dotEl.className = 'status-dot ' + (this.provider.provider === 'offline' ? 'offline' : 'online');
     }
-
+    
     // Update all status indicators
     document.querySelectorAll('.provider-label').forEach(el => {
       el.textContent = this.provider.label;
     });
   },
 
-  // ─── Screen Management ────────────────────────────────────────────────────
-  showScreen(name, data = {}) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    const screen = document.getElementById(`screen-${name}`);
-    if (screen) screen.classList.add('active');
-
-    // Update window title
-    const titles = {
-      home:     '⚡ TVT — Tesla Visual Thinking',
-      chat:     `TVT : ${data.userName || 'Bạn'} — Phiên tư duy`,
-      settings: '⚙️ Cài đặt AI',
-      history:  '📂 Lịch sử phiên'
-    };
-    document.getElementById('window-title').textContent = titles[name] || titles.home;
-
-    if (name === 'home') this.renderHome();
-    if (name === 'history') this.renderHistory();
-    if (name === 'settings') this.renderSettings();
-  },
-
-  // ─── Home Screen ─────────────────────────────────────────────────────────
-  renderHome() {
+  // ─── Right Panel: Models ──────────────────────────────────────────────────
+  renderModels() {
     const modelList = document.getElementById('model-list');
     if (!modelList) return;
     modelList.innerHTML = '';
@@ -73,12 +70,12 @@ const App = {
     });
   },
 
-  // ─── Start Session ────────────────────────────────────────────────────────
+  // ─── Start/Resume Session ─────────────────────────────────────────────────
   startSession(modelName) {
     TVTCore.createSession(modelName);
     TVTCore.session.aiProvider = this.provider.provider;
-    this.showScreen('chat', { userName: 'Bạn' });
     this.clearChat();
+    this.renderHistory();
     this.startRound1();
   },
 
@@ -86,7 +83,6 @@ const App = {
     const sess = TVTCore.loadSession(id);
     if (!sess) { this.showToast('Không tìm thấy phiên!'); return; }
 
-    this.showScreen('chat', { userName: 'Bạn' });
     this.clearChat();
 
     // Replay chat history
@@ -100,13 +96,14 @@ const App = {
       if (q) this.askQuestion(q.question, q.index, q.total);
     } else if (sess.phase === 'done') {
       this.tvtSay('Phiên này đã hoàn thành! Dùng nút 💾 để tải kết quả.');
+      this.setInputMode('done');
     }
   },
 
-  // ─── Round 1: Initial Questions ───────────────────────────────────────────
+  // ─── Flow Logic ───────────────────────────────────────────────────────────
   startRound1() {
     const model = TVTCore.getModel();
-    this.tvtSay(`Xin chào! Tôi là **TVT** — Tesla Visual Thinking.\n\nChúng ta sẽ dùng phương pháp **${model.name}** để phân tích vấn đề của bạn.\n\n_Hãy trả lời từng câu hỏi thật chi tiết. Càng cụ thể, kết quả càng tốt._ 💡`);
+    this.tvtSay(`Chúng ta sẽ dùng phương pháp **${model.name}** để phân tích vấn đề của bạn.\n\n_Hãy trả lời từng câu hỏi để tôi có thể hiểu rõ nhất nhé._ 💡`);
     setTimeout(() => this.askNextQuestion(), 800);
   },
 
@@ -121,10 +118,9 @@ const App = {
     let text = `**[${index}/${total}] ${q.text}**`;
     if (q.hint) text += `\n\n_💡 ${q.hint}_`;
     this.tvtSay(text);
-    this.setInputMode('answer', q.min_words);
+    this.setInputMode('answer');
   },
 
-  // ─── Round 1b: Follow-ups ─────────────────────────────────────────────────
   startFollowups(questions) {
     if (!questions || questions.length === 0) {
       this.startRound2();
@@ -146,7 +142,6 @@ const App = {
     this.setInputMode('followup');
   },
 
-  // ─── Round 2: Self Research ───────────────────────────────────────────────
   startRound2() {
     const task = TVTCore.session.analysis?.self_research_task;
     if (!task) { this.startGenerating(); return; }
@@ -158,7 +153,6 @@ const App = {
     this.setInputMode('research');
   },
 
-  // ─── Round 3: Generate Solutions ──────────────────────────────────────────
   async startGenerating() {
     this.tvtSay('⚙️ _TVT đang tổng hợp giải pháp..._');
     this.setInputMode('disabled');
@@ -170,20 +164,20 @@ const App = {
       TVTCore.session.phase = 'done';
       TVTCore.session.status = 'completed';
       TVTCore._save();
+      this.renderHistory();
 
       if (TVTCore.session.skippedResearch) {
         this.tvtSay('⚠️ _Giải pháp dưới đây mang tính lý thuyết do bỏ qua nghiên cứu thực tế._');
       }
       this.tvtSay('🚀 **Giải pháp TVT đề xuất:**\n\n' + solutions);
-      this.tvtSay(`✅ **Phiên hoàn thành!** ID: \`${TVTCore.session.id}\`\nDùng nút **💾** để tải kết quả về.`);
+      this.tvtSay(`✅ **Phiên hoàn thành!**\nDùng nút **💾** ở phía trên cùng bên phải để tải kết quả về máy.`);
       this.setInputMode('done');
     } catch (err) {
       this.tvtSay(`❌ Lỗi: ${err.message}\n\nThử lại hoặc kiểm tra cài đặt AI.`);
-      this.setInputMode('answer', 0);
+      this.setInputMode('answer');
     }
   },
 
-  // ─── AI Analysis ──────────────────────────────────────────────────────────
   async runAnalysis() {
     this.tvtSay('🤖 _TVT đang phân tích..._');
     this.setInputMode('disabled');
@@ -196,28 +190,26 @@ const App = {
       TVTCore.session.phase = 'round1b';
       TVTCore._save();
 
-      // Display analysis
-      this.tvtSay(`📊 **Tóm tắt:**\n${analysis.summary}`);
+      this.tvtSay(`📊 **Tóm tắt vấn đề của bạn:**\n${analysis.summary}`);
 
       if (analysis.ambiguities?.length > 0) {
         const amb = analysis.ambiguities.map((a, i) => `${i + 1}. ${a}`).join('\n');
-        this.tvtSay(`⚠️ **Điểm cần làm rõ:**\n${amb}`);
+        this.tvtSay(`⚠️ **Điểm chưa rõ ràng:**\n${amb}`);
       }
 
       this.startFollowups(analysis.follow_up_questions || []);
     } catch (err) {
-      // Parsing failed → try offline fallback
       console.warn('AI parse failed, using offline:', err);
       const offlineRaw = AI_PROVIDERS._offlineAnalysis('');
       const analysis = JSON.parse(offlineRaw);
       TVTCore.session.analysis = analysis;
       TVTCore._save();
-      this.tvtSay(`📊 **Tóm tắt (offline):**\n${analysis.summary}`);
+      this.tvtSay(`📊 **Tóm tắt (tự động nội bộ):**\n${analysis.summary}`);
       this.startFollowups([]);
     }
   },
 
-  // ─── Message Rendering ────────────────────────────────────────────────────
+  // ─── Input & Chat Rendering ───────────────────────────────────────────────
   tvtSay(text, save = true) {
     if (save) TVTCore.addMessage('tvt', text);
     this.appendMessage('tvt', text);
@@ -262,10 +254,8 @@ const App = {
     if (chat) chat.innerHTML = '';
   },
 
-  // ─── Input Modes ──────────────────────────────────────────────────────────
-  setInputMode(mode, minWords = 0) {
+  setInputMode(mode) {
     this._inputMode = mode;
-    this._minWords = minWords;
     const input = document.getElementById('msg-input');
     const sendBtn = document.getElementById('send-btn');
     const hint = document.getElementById('input-hint');
@@ -288,17 +278,16 @@ const App = {
         input.placeholder = `Nhập câu trả lời...`;
         if (hint) hint.textContent = ``;
       } else if (mode === 'research') {
-        input.placeholder = "Nhập kết quả nghiên cứu, hoặc gõ 'skip'...";
-        if (hint) hint.textContent = "⌨ Nhập kết quả nghiên cứu hoặc 'skip'";
+        input.placeholder = "Nhập kết quả nghiên cứu (hoặc gõ 'skip')...";
+        if (hint) hint.textContent = "⌨ 'skip' để bỏ qua";
       } else if (mode === 'followup') {
         input.placeholder = 'Trả lời câu hỏi bổ sung...';
         if (hint) hint.textContent = '';
       }
-      input.focus();
+      setTimeout(()=>input.focus(), 50);
     }
   },
 
-  // ─── Send Handler ─────────────────────────────────────────────────────────
   handleSend() {
     const input = document.getElementById('msg-input');
     if (!input) return;
@@ -306,13 +295,11 @@ const App = {
     if (!text || input.disabled) return;
 
     const mode = this._inputMode;
+    const wc = TVTCore.countWords(text);
+
+    if (wc < 1) return;
 
     if (mode === 'answer') {
-      const wc = TVTCore.countWords(text);
-      if (wc < 1) {
-        this.showToast(`⚠️ Vui lòng nhập câu trả lời`);
-        return;
-      }
       this.userSaid(text);
       input.value = '';
 
@@ -342,14 +329,14 @@ const App = {
     }
   },
 
-  // ─── History Screen ───────────────────────────────────────────────────────
+  // ─── Right Panel: History ─────────────────────────────────────────────────
   renderHistory() {
     const list = document.getElementById('history-list');
     if (!list) return;
     const sessions = TVTCore.listSessions();
 
     if (sessions.length === 0) {
-      list.innerHTML = '<div class="history-empty">Chưa có phiên nào được lưu.</div>';
+      list.innerHTML = '<div style="text-align:center;color:#888;font-size:11px;padding:10px;">Chưa có phiên nào.</div>';
       return;
     }
 
@@ -357,43 +344,45 @@ const App = {
     sessions.forEach(s => {
       const model = TVT_MODELS[s.modelName];
       const div = document.createElement('div');
-      div.className = `history-item ${s.status === 'completed' ? 'done' : ''}`;
+      div.className = `history-item`;
+      if(s.status === 'completed') div.style.borderLeft = '3px solid #22aa44';
+
       div.innerHTML = `
-        <div class="history-item-main">
-          <span class="history-icon">${model?.icon || '❓'}</span>
-          <span class="history-info">
-            <strong>${model?.name || s.modelName}</strong>
-            <small>${s.id} · ${s.updatedAt.slice(0,10)}</small>
-          </span>
+        <div class="history-item-top">
+          <strong>${model?.icon || '❓'} ${model?.name || s.modelName}</strong>
           <span class="history-status">${s.status === 'completed' ? '✅' : '🟡'}</span>
         </div>
+        <div style="font-size:10px; color:#666; margin-bottom:4px;">Ngày: ${new Date(s.createdAt).toLocaleDateString('vi')}</div>
         <div class="history-actions">
-          <button onclick="App.resumeSession('${s.id}')">▶ Tiếp tục</button>
+          <button onclick="App.resumeSession('${s.id}')">▶ Mở</button>
           <button onclick="App.downloadJSON('${s.id}')">💾 JSON</button>
-          <button onclick="App.downloadMD('${s.id}')" class="secondary">📄 MD</button>
-          <button onclick="App.deleteSessionUI('${s.id}')" class="danger">🗑</button>
+          <button onclick="App.downloadMD('${s.id}')">📄 MD</button>
+          <button onclick="App.deleteSessionUI('${s.id}')" style="color:#c00000; flex:0.4;">✕</button>
         </div>`;
       list.appendChild(div);
     });
   },
 
   deleteSessionUI(id) {
+    if(!confirm("Xóa phiên này?")) return;
     TVTCore.deleteSession(id);
     this.renderHistory();
+    if(TVTCore.session && TVTCore.session.id === id) {
+      TVTCore.session = null;
+      this.welcomeText();
+    }
   },
 
   downloadJSON(id) {
     const sess = TVTCore.loadSession(id);
     if (!sess) return;
-    const data = JSON.stringify(sess, null, 2);
-    this._download(`tvt_${id}.json`, data, 'application/json');
+    this._download(`tvt_${id}.json`, JSON.stringify(sess, null, 2), 'application/json');
   },
 
   downloadMD(id) {
     const sess = TVTCore.loadSession(id);
     if (!sess) return;
-    const md = TVTCore.exportMarkdown();
-    this._download(`tvt_${id}.md`, md, 'text/markdown');
+    this._download(`tvt_${id}.md`, TVTCore.exportMarkdown(), 'text/markdown');
   },
 
   _download(filename, content, type) {
@@ -403,27 +392,30 @@ const App = {
     a.click();
   },
 
-  // ─── Settings Screen ──────────────────────────────────────────────────────
+  // ─── Right Panel: Settings ────────────────────────────────────────────────
   renderSettings() {
     const cfg = AI_PROVIDERS.getConfig();
     const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
     setVal('cfg-gemini-key', cfg.geminiKey);
-    setVal('cfg-gemini-model', cfg.geminiModel || 'gemini-2.0-flash');
     setVal('cfg-groq-key', cfg.groqKey);
-    setVal('cfg-openrouter-key', cfg.openrouterKey);
   },
 
   async saveSettings() {
     const getVal = id => document.getElementById(id)?.value?.trim() || '';
+    
+    // Quick validation and save
+    const btn = document.getElementById('btn-save-settings');
+    const oldText = btn.textContent;
+    btn.textContent = 'Đang kiểm tra...';
+    
     AI_PROVIDERS.saveConfig({
       geminiKey: getVal('cfg-gemini-key'),
-      geminiModel: getVal('cfg-gemini-model') || 'gemini-2.0-flash',
-      groqKey: getVal('cfg-groq-key'),
-      openrouterKey: getVal('cfg-openrouter-key')
+      groqKey: getVal('cfg-groq-key')
     });
+    
     await this.detectAI();
-    this.showToast('✅ Đã lưu! AI: ' + this.provider.label);
-    setTimeout(() => this.showScreen('home'), 1200);
+    this.showToast('✅ Đã cập nhật xong cấu hình AI!');
+    btn.textContent = oldText;
   },
 
   // ─── Utils ────────────────────────────────────────────────────────────────
@@ -437,7 +429,6 @@ const App = {
 
   playSound(type) {
     if (!this.soundEnabled) return;
-    // Simple beep using Web Audio API
     try {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
       const osc = ctx.createOscillator();
@@ -452,10 +443,16 @@ const App = {
 
   // ─── Event Binding ────────────────────────────────────────────────────────
   bindEvents() {
-    // Send button
-    document.getElementById('send-btn')?.addEventListener('click', () => this.handleSend());
+    // Top right save buttons
+    document.getElementById('btn-download-json')?.addEventListener('click', () => {
+      if (TVTCore.session) this.downloadJSON(TVTCore.session.id);
+    });
+    document.getElementById('btn-download-md')?.addEventListener('click', () => {
+      if (TVTCore.session) this.downloadMD(TVTCore.session.id);
+    });
 
-    // Enter key in textarea
+    // Send Input
+    document.getElementById('send-btn')?.addEventListener('click', () => this.handleSend());
     document.getElementById('msg-input')?.addEventListener('keydown', e => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
@@ -463,39 +460,12 @@ const App = {
       }
     });
 
-    // Sound checkbox
+    // Sub-settings
     document.getElementById('sound-check')?.addEventListener('change', e => {
       this.soundEnabled = e.target.checked;
     });
-
-    // Nav buttons
-    document.getElementById('nav-home')?.addEventListener('click', () => this.showScreen('home'));
-    document.getElementById('nav-history')?.addEventListener('click', () => this.showScreen('history'));
-    document.getElementById('nav-settings')?.addEventListener('click', () => this.showScreen('settings'));
-    document.getElementById('btn-close')?.addEventListener('click', () => {
-      if (confirm('Quay về màn hình chính?')) this.showScreen('home');
-    });
-
-    // Settings save
     document.getElementById('btn-save-settings')?.addEventListener('click', () => this.saveSettings());
-    document.getElementById('btn-test-ai')?.addEventListener('click', async () => {
-      this.renderSettings(); // ensure latest values saved first
-      document.getElementById('btn-test-ai').textContent = 'Đang kiểm tra...';
-      await this.saveSettings();
-      document.getElementById('btn-test-ai').textContent = '🔍 Kiểm tra AI';
-    });
-
-    // Download current session
-    document.getElementById('btn-download-json')?.addEventListener('click', () => {
-      if (!TVTCore.session) return;
-      this._download(`tvt_${TVTCore.session.id}.json`, TVTCore.exportJSON(), 'application/json');
-    });
-    document.getElementById('btn-download-md')?.addEventListener('click', () => {
-      if (!TVTCore.session) return;
-      this._download(`tvt_${TVTCore.session.id}.md`, TVTCore.exportMarkdown(), 'text/markdown');
-    });
   }
 };
 
-// Boot
 window.addEventListener('DOMContentLoaded', () => App.init());
