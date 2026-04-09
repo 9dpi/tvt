@@ -84,8 +84,8 @@ const TVTCore = {
     if (!q) return { ok: false, error: 'No current question' };
 
     const words = this.countWords(answer);
-    if (words < q.min_words) {
-      return { ok: false, error: `Cần ít nhất ${q.min_words} từ (hiện tại: ${words} từ)` };
+    if (words < 1) {
+      return { ok: false, error: `Vui lòng nhập nội dung câu trả lời` };
     }
 
     this.session.answers[q.id] = answer.trim();
