@@ -108,6 +108,13 @@ const App = {
     this.renderModels(); // refresh to show active state
     this.startRound1();
     document.querySelector('.xp-window').classList.remove('show-menu');
+
+    // Proactive onboarding if offline
+    if (this.provider?.provider === 'offline') {
+      setTimeout(() => {
+        this.tvtSay(`💡 **Mẹo:** Bạn đang dùng chế độ **Offline (Hạn chế)**. Để NIKOLA kể chuyện và phân tích "thông minh" hơn, hãy [**bấm vào đây để lấy mã Groq miễn phí**](https://console.groq.com/keys) và dán vào bảng bên phải nhé! (Chỉ mất 10 giây)`, false);
+      }, 2000);
+    }
   },
 
   resumeSession(id) {
