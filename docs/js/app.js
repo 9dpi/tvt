@@ -145,6 +145,13 @@ const App = {
     });
   },
 
+  newChat() {
+    TVTCore.session = null;
+    localStorage.removeItem('tvt_last_id');
+    this.renderModels();
+    this.welcomeText();
+  },
+
   // ─── Flow Logic ───────────────────────────────────────────────────────────
   startRound1() {
     const model = TVTCore.getModel();
@@ -534,7 +541,8 @@ const App = {
 
   // ─── Event Binding ────────────────────────────────────────────────────────
   bindEvents() {
-    // Top right save buttons
+    // Top right save & new chat buttons
+    document.getElementById('btn-new-chat')?.addEventListener('click', () => this.newChat());
     document.getElementById('btn-download-json')?.addEventListener('click', () => {
       if (TVTCore.session) this.downloadJSON(TVTCore.session.id);
     });
