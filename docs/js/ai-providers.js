@@ -31,7 +31,7 @@ const AI_PROVIDERS = {
     return Promise.race([
       this._detectBestLogic(),
       new Promise(resolve => setTimeout(() => {
-        resolve({ provider: 'offline', model: null, free: true, local: true, label: '📴 Offline (Timeout)' });
+        resolve({ provider: 'offline', model: null, free: true, local: true, label: '📴 Offline' });
       }, 3000))
     ]);
   },
@@ -120,7 +120,7 @@ const AI_PROVIDERS = {
 
     // 6. Offline fallback
     this._status = 'offline';
-    return { provider: 'offline', model: null, free: true, local: true, label: '📴 Offline (Quy tắc mẫu)' };
+    return { provider: 'offline', model: null, free: true, local: true, label: '📴 Offline' };
   },
 
   /**

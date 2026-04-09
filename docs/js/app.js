@@ -67,7 +67,7 @@ const App = {
     try {
       this.provider = await AI_PROVIDERS.detectBest();
     } catch(e) {
-      this.provider = { provider: 'offline', label: '📴 Offline (Fallback)' };
+      this.provider = { provider: 'offline', label: '📴 Offline' };
     }
 
     if (statusEl) statusEl.textContent = this.provider.label || 'Offline';

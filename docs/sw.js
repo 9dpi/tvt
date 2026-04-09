@@ -3,7 +3,7 @@
  * GitHub Pages compatible
  */
 
-const CACHE_NAME = 'tvt-v4.1.1';
+const CACHE_NAME = 'tvt-v4.1.2';
 const STATIC_ASSETS = [
   './',
   './index.html',
