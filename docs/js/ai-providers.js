@@ -103,7 +103,8 @@ const AI_PROVIDERS = {
     const res = await fetch('http://localhost:11434/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model, prompt, stream: false })
+      body: JSON.stringify({ model, prompt, stream: false }),
+      signal: AbortSignal.timeout(30000)
     });
     if (!res.ok) throw new Error('Ollama error: ' + res.status);
     const data = await res.json();
@@ -127,7 +128,8 @@ const AI_PROVIDERS = {
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+        signal: AbortSignal.timeout(30000)
       }
     );
     if (!res.ok) {
@@ -149,7 +151,8 @@ const AI_PROVIDERS = {
         model: this._config.groqModel || 'llama-3.3-70b-versatile',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7
-      })
+      }),
+      signal: AbortSignal.timeout(30000)
     });
     if (!res.ok) throw new Error('Groq error: ' + res.status);
     const data = await res.json();

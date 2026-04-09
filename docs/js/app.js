@@ -181,7 +181,9 @@ const App = {
       this.tvtSay(`✅ **Phiên hoàn thành!**\nDùng nút **💾** ở phía trên cùng bên phải để tải kết quả về máy.`);
       this.setInputMode('done');
     } catch (err) {
-      this.tvtSay(`❌ Lỗi: ${err.message}\n\nThử lại hoặc kiểm tra cài đặt AI.`);
+      console.error('Generating solution failed:', err);
+      this.updateProgress(-1);
+      this.tvtSay(`❌ **Lỗi tạo giải pháp:** ${err.message}\n\nCách khắc phục: Hãy kiểm tra Token AI ở bảng bên phải hoặc thử chọn mô hình AI khác.`);
       this.setInputMode('answer');
     }
   },
@@ -215,13 +217,23 @@ const App = {
 
       this.startFollowups(analysis.follow_up_questions || []);
     } catch (err) {
-      console.warn('AI parse failed, using offline:', err);
-      const offlineRaw = AI_PROVIDERS._offlineAnalysis('');
-      const analysis = JSON.parse(offlineRaw);
-      TVTCore.session.analysis = analysis;
-      TVTCore._save();
-      this.tvtSay(`📊 **Tóm tắt (tự động nội bộ):**\n${analysis.summary}`);
-      this.startFollowups([]);
+      console.error('Analysis phase failed:', err);
+      this.updateProgress(-1);
+      
+      // Attempt offline fallback automatically
+      this.tvtSay(`⚠️ **AI gặp sự cố:** ${err.message}. Đang chuyển sang chế độ phân tích nội bộ...`);
+      
+      try {
+        const offlineRaw = AI_PROVIDERS._offlineAnalysis('');
+        const analysis = JSON.parse(offlineRaw);
+        TVTCore.session.analysis = analysis;
+        TVTCore._save();
+        this.tvtSay(`📊 **Tóm tắt (nội bộ):**\n${analysis.summary}`);
+        this.startFollowups([]);
+      } catch(e) {
+        this.tvtSay(`❌ Lỗi hệ thống: Không thể phân tích. Vui lòng thử lại sau hoặc kiểm tra kết nối.`);
+        this.setInputMode('answer');
+      }
     }
   },
 

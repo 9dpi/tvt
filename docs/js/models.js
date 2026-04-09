@@ -24,12 +24,14 @@ Where: {where}
 When: {when}
 How: {how}
 
+Trường hợp thông tin người dùng cung cấp quá ít hoặc không rõ ràng, bạn TUYỆT ĐỐI không được để trống. Hãy dùng "summary" để gợi ý cách mô tả tốt hơn và dùng "follow_up_questions" để hỏi ngược lại người dùng.
+
 Trả lời CHÍNH XÁC bằng JSON hợp lệ (không thêm text bên ngoài):
 {
-  "summary": "Tóm tắt 2-3 câu súc tích",
-  "ambiguities": ["điểm mơ hồ 1", "điểm mơ hồ 2"],
-  "follow_up_questions": ["câu hỏi bổ sung 1", "câu hỏi bổ sung 2"],
-  "self_research_task": "Nhiệm vụ tự tìm kiếm thực tế cụ thể"
+  "summary": "Tóm tắt hoặc Gợi ý nếu thông tin chưa đủ",
+  "ambiguities": ["điểm mơ hồ hoặc giả định"],
+  "follow_up_questions": ["câu hỏi bổ sung hoặc câu hỏi ngược lại để làm rõ"],
+  "self_research_task": "Nhiệm vụ thực tế cụ thể"
 }`,
     solution_prompt: `Bạn là TVT (Tesla Visual Thinking). Phong cách: thực tiễn, dự đoán lỗi, tư duy first principles.
 
@@ -68,12 +70,14 @@ Weaknesses: {weaknesses}
 Opportunities: {opportunities}
 Threats: {threats}
 
+Luôn phải có phản hồi. Nếu thông tin thiếu, hãy nêu giả định trong "summary" và hỏi thêm trong "follow_up_questions". TUYỆT ĐỐI không trả lời trống.
+
 JSON hợp lệ:
 {
-  "summary": "Bức tranh tổng thể 2-3 câu",
-  "ambiguities": ["điểm mơ hồ 1"],
-  "follow_up_questions": ["câu hỏi 1"],
-  "self_research_task": "Nhiệm vụ thực tế cụ thể"
+  "summary": "Phân tích tổng thể hoặc gợi ý bổ sung",
+  "ambiguities": ["điểm cần làm rõ"],
+  "follow_up_questions": ["câu hỏi đào sâu/ngược lại"],
+  "self_research_task": "Nhiệm vụ thực tế"
 }`,
     solution_prompt: `TVT SWOT Analysis. {problem_summary}. Nghiên cứu: {research}.
 
@@ -103,12 +107,14 @@ Phân rã: {breakdown}
 Giới hạn: {physics}
 Xây lại: {rebuild}
 
+Nếu thông tin chưa đủ để phân rã, hãy dùng "summary" để hướng dẫn người dùng cách tư duy First Principles và đặt câu hỏi ngược lại.
+
 JSON:
 {
-  "summary": "Vấn đề cốt lõi thực sự (không phải triệu chứng)",
+  "summary": "Vấn đề cốt lõi hoặc Hướng dẫn tư duy lại",
   "ambiguities": ["giả định cần thách thức"],
-  "follow_up_questions": ["câu hỏi đào sâu"],
-  "self_research_task": "Kiểm chứng giả định X bằng dữ liệu thực tế"
+  "follow_up_questions": ["câu hỏi đào sâu/ngược lại"],
+  "self_research_task": "Kiểm chứng thực tế"
 }`,
     solution_prompt: `TVT First Principles. Cốt lõi: {problem_summary}. Nghiên cứu: {research}.
 
