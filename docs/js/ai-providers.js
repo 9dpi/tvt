@@ -28,6 +28,15 @@ const AI_PROVIDERS = {
    * Returns provider info object
    */
   async detectBest() {
+    return Promise.race([
+      this._detectBestLogic(),
+      new Promise(resolve => setTimeout(() => {
+        resolve({ provider: 'offline', model: null, free: true, local: true, label: '📴 Offline (Timeout)' });
+      }, 3000))
+    ]);
+  },
+
+  async _detectBestLogic() {
     // 1. Try Ollama (local, completely free)
     try {
       const res = await fetch('http://localhost:11434/api/tags', {
@@ -64,24 +73,24 @@ const AI_PROVIDERS = {
     // 3. Try configured Gemini key (free tier)
     if (this._config.geminiKey) {
       this._status = 'gemini';
-      return { provider: 'gemini', model: this._config.geminiModel || 'gemini-2.0-flash', free: true, local: false, label: '✨ Gemini (Free)' };
+      return { provider: 'gemini', model: this._config.geminiModel || 'gemini-2.0-flash', free: true, local: false, label: '✨ Gemini' };
     }
 
     // 4. Try configured Groq key (free tier)
     if (this._config.groqKey) {
       this._status = 'groq';
-      return { provider: 'groq', model: this._config.groqModel || 'llama-3.3-70b-versatile', free: true, local: false, label: '⚡ Groq (Free)' };
+      return { provider: 'groq', model: this._config.groqModel || 'llama-3.3-70b-versatile', free: true, local: false, label: '⚡ Groq' };
     }
 
     // 5. Try OpenRouter free models
     if (this._config.openrouterKey) {
       this._status = 'openrouter';
-      return { provider: 'openrouter', model: 'meta-llama/llama-3.2-3b-instruct:free', free: true, local: false, label: '🔀 OpenRouter (Free)' };
+      return { provider: 'openrouter', model: 'meta-llama/llama-3.2-3b-instruct:free', free: true, local: false, label: '🔀 OpenRouter' };
     }
 
     // 6. Offline fallback
     this._status = 'offline';
-    return { provider: 'offline', model: null, free: true, local: true, label: '📴 Offline (Rule-based)' };
+    return { provider: 'offline', model: null, free: true, local: true, label: '📴 Offline (Quy tắc mẫu)' };
   },
 
   /**

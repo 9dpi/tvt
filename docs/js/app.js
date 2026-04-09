@@ -4,7 +4,7 @@
  */
 
 const App = {
-  provider: null,
+  provider: { provider: 'offline', model: null, free: true, local: true, label: 'Đang tìm AI...' },
   soundEnabled: false,
 
   // ─── Init ─────────────────────────────────────────────────────────────────
@@ -40,9 +40,13 @@ const App = {
     const dotEl = document.getElementById('ai-status-dot');
     if (statusEl) statusEl.textContent = 'Đang tìm AI...';
 
-    this.provider = await AI_PROVIDERS.detectBest();
+    try {
+      this.provider = await AI_PROVIDERS.detectBest();
+    } catch(e) {
+      this.provider = { provider: 'offline', label: '📴 Offline (Fallback)' };
+    }
 
-    if (statusEl) statusEl.textContent = this.provider.label;
+    if (statusEl) statusEl.textContent = this.provider.label || 'Offline';
     if (dotEl) {
       dotEl.className = 'status-dot ' + (this.provider.provider === 'offline' ? 'offline' : 'online');
     }
@@ -92,7 +96,7 @@ const App = {
     }
 
     TVTCore.createSession(modelName);
-    TVTCore.session.aiProvider = this.provider.provider;
+    TVTCore.session.aiProvider = this.provider ? this.provider.provider : 'offline';
     localStorage.setItem('tvt_last_id', TVTCore.session.id);
     this.clearChat();
     this.renderHistory();
