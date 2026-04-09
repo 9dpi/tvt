@@ -310,7 +310,22 @@ const App = {
     if (mode === 'answer') {
       const wc = TVTCore.countWords(text);
       if (wc < this._minWords) {
-        this.showToast(`Cần ít nhất ${this._minWords} từ (hiện tại: ${wc})`);
+        this.showToast(`⚠️ Cần ít nhất ${this._minWords} từ (bạn mới nhập ${wc} từ)`);
+        
+        // Highlight hint text
+        const hint = document.getElementById('input-hint');
+        if (hint) {
+          const original = hint.innerHTML;
+          hint.innerHTML = `<span style="color:#c00000; font-weight:bold">⚠️ Bạn cần nhập tối thiểu ${this._minWords} từ (hiện tại: ${wc} từ)</span>`;
+          setTimeout(() => { hint.innerHTML = original; }, 3500);
+        }
+        
+        // Highlight border
+        const input = document.getElementById('msg-input');
+        if (input) {
+          input.style.borderColor = '#c00000';
+          setTimeout(() => { input.style.borderColor = ''; }, 1000);
+        }
         return;
       }
       this.userSaid(text);
