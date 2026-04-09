@@ -86,9 +86,16 @@
             <span id="ai-status-text">Đang tìm AI...</span>
           </div>
           <div class="xp-settings-mini">
-            <input class="settings-input" id="cfg-gemini-key" type="password" placeholder="Gemini API Key...">
-            <input class="settings-input" id="cfg-groq-key" type="password" placeholder="Groq API Key...">
-            <button class="xp-action-btn" id="btn-save-settings">Lưu Token</button>
+            <div style="font-size: 10px; color: #555; margin-bottom: 4px;">Tăng cường tính năng bằng AI Cloud (Tuỳ chọn):</div>
+            <div style="position: relative;">
+              <input class="settings-input" id="cfg-gemini-key" style="width: 100%;" type="password" placeholder="Mã Google Gemini...">
+              <a href="https://aistudio.google.com/app/apikey" target="_blank" style="font-size: 9px; position: absolute; right: 2px; top: 3px; color: #0054E3; text-decoration: underline;" title="Lấy mã Gemini miễn phí">Lấy mã</a>
+            </div>
+            <div style="position: relative;">
+              <input class="settings-input" id="cfg-groq-key" style="width: 100%;" type="password" placeholder="Mã mạng Groq...">
+              <a href="https://console.groq.com/keys" target="_blank" style="font-size: 9px; position: absolute; right: 2px; top: 3px; color: #0054E3; text-decoration: underline;" title="Lấy mã Groq tốc độ cao">Lấy mã</a>
+            </div>
+            <button class="xp-action-btn" id="btn-save-settings" style="margin-top: 2px;">💾 Lưu Token</button>
           </div>
         </div>
       </div>
