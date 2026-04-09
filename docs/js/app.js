@@ -79,6 +79,18 @@ const App = {
 
   // ─── Start/Resume Session ─────────────────────────────────────────────────
   startSession(modelName) {
+    if (TVTCore.session && TVTCore.session.status === 'active') {
+      if (TVTCore.session.modelName === modelName) return;
+      
+      this.tvtSay(`🔄 _Đã chuyển sang phương pháp: **${TVT_MODELS[modelName].name}**_`, false);
+      TVTCore.switchModel(modelName);
+      
+      // Keep everything, just re-ask the current question of the new model
+      this.renderModels();
+      this.askNextQuestion();
+      return;
+    }
+
     TVTCore.createSession(modelName);
     TVTCore.session.aiProvider = this.provider.provider;
     localStorage.setItem('tvt_last_id', TVTCore.session.id);

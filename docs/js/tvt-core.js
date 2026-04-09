@@ -32,6 +32,15 @@ const TVTCore = {
     return session;
   },
 
+  switchModel(modelName) {
+    if (!this.session) return;
+    this.session.modelName = modelName;
+    // Potentially reset index if the new model is different, 
+    // but keep answers for AI context even if IDs don't match.
+    this.session.updatedAt = new Date().toISOString();
+    this._save();
+  },
+
   loadSession(id) {
     const all = this.listSessions();
     const sess = all.find(s => s.id === id);
