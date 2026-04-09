@@ -163,6 +163,27 @@ const App = {
     this.welcomeText();
   },
 
+  showAIHelp() {
+    this.tvtSay(`### 🛠️ Hướng dẫn lấy Mã AI (API Key) miễn phí
+
+Nếu bạn là người dùng mới, hãy làm theo 3 bước sau để NIKOLA trở nên thông minh hơn:
+
+**Bước 1: Chọn dịch vụ**
+- **Google Gemini** (Khuyên dùng): Bấm vào chữ **"Lấy mã"** bên cạnh ô mã Gemini.
+- **Groq** (Siêu nhanh): Bấm vào chữ **"Lấy mã"** bên cạnh ô mã Groq.
+
+**Bước 2: Click tạo mã**
+- Đăng nhập bằng tài khoản Google của bạn.
+- Tìm nút có chữ **"Create API Key"** (Tạo mã) và bấm vào đó.
+- Một dãy ký tự dài sẽ hiện ra (ví dụ: \`AIzaSy...\`), hãy bấm **Copy** (Sao chép).
+
+**Bước 3: Dán và Lưu**
+- Quay lại trang TVT này, **Dán (Paste)** mã đó vào ô tương ứng ở bên phải.
+- Bấm nút **💾 Lưu Token**.
+
+_Sau khi lưu, NIKOLA sẽ tự động nhận diện và bạn có thể bắt đầu tư duy ngay lập tức!_`, false);
+  },
+
   // ─── Flow Logic ───────────────────────────────────────────────────────────
   startRound1() {
     const model = TVTCore.getModel();
@@ -569,6 +590,7 @@ const App = {
     });
 
     // Top right save & new chat buttons
+    document.getElementById('btn-ai-help')?.addEventListener('click', () => this.showAIHelp());
     document.getElementById('btn-new-chat')?.addEventListener('click', () => this.newChat());
     document.getElementById('btn-download-json')?.addEventListener('click', () => {
       if (TVTCore.session) this.downloadJSON(TVTCore.session.id);
