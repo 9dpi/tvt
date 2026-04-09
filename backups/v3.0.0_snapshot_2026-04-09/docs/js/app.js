@@ -5,12 +5,7 @@
 
 const App = {
   provider: { provider: 'offline', model: null, free: true, local: true, label: 'Đang tìm AI...' },
-  soundEnabled: true,
-  sounds: {
-    send: 'https://raw.githubusercontent.com/thefalken/yahoo-messenger-sounds/master/ymsg_send.wav',
-    receive: 'https://raw.githubusercontent.com/thefalken/yahoo-messenger-sounds/master/ymsg_receive.wav',
-    buzz: 'https://raw.githubusercontent.com/thefalken/yahoo-messenger-sounds/master/ymsg_buzz.wav'
-  },
+  soundEnabled: false,
 
   // ─── Init ─────────────────────────────────────────────────────────────────
   async init() {
@@ -25,8 +20,6 @@ const App = {
     this.renderModels();
     this.renderHistory();
     this.renderSettings();
-    
-    document.getElementById('btn-buzz')?.addEventListener('click', () => this.buzz());
     
     // Auto-resume last session if it exists in localStorage
     const lastSessionId = localStorage.getItem('tvt_last_id');
@@ -91,6 +84,8 @@ const App = {
       const active = TVTCore.session && TVTCore.session.modelName === key;
       const btn = document.createElement('button');
       btn.className = `model-btn ${active ? 'active' : ''}`;
+      if (active) btn.style.background = '#E5EFFD';
+      if (active) btn.style.borderColor = '#0054E3';
       
       btn.dataset.model = key;
       btn.innerHTML = `<span class="model-icon">${model.icon}</span>
@@ -369,27 +364,6 @@ _Sau khi lưu, NIKOLA sẽ tự động nhận diện và bạn có thể bắt 
   },
 
   // ─── Input & Chat Rendering ───────────────────────────────────────────────
-  playSound(type) {
-    if (!this.soundEnabled) return;
-    try {
-      const url = this.sounds[type];
-      if (url) {
-        const audio = new Audio(url);
-        audio.volume = 0.4;
-        audio.play().catch(() => {});
-      }
-    } catch(e) {}
-  },
-
-  buzz() {
-    this.playSound('buzz');
-    const win = document.getElementById('main-window');
-    if (win) {
-      win.classList.add('buzz-shake');
-      setTimeout(() => win.classList.remove('buzz-shake'), 500);
-    }
-  },
-
   tvtSay(text, save = true) {
     if (save) TVTCore.addMessage('tvt', text);
     this.appendMessage('tvt', text);
@@ -647,6 +621,19 @@ _Sau khi lưu, NIKOLA sẽ tự động nhận diện và bạn có thể bắt 
     setTimeout(() => toast.classList.remove('show'), 2800);
   },
 
+  playSound(type) {
+    if (!this.soundEnabled) return;
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = type === 'receive' ? 880 : 660;
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+      osc.start(); osc.stop(ctx.currentTime + 0.15);
+    } catch(_) {}
+  },
 
   // ─── Event Binding ────────────────────────────────────────────────────────
   bindEvents() {

@@ -16,15 +16,12 @@
 
 ---
 
-## ✨ Tính năng mới (v4.0) — Cộng đồng Tư Duy Mở
+## ✨ Tính năng mới (v3.0)
 
-- **🌐 Community Panel**: Cột trái hiển thị vấn đề cộng đồng đang thảo luận — công khai, minh bạch, ai cũng thấy.
-- **✏️ Đặt câu hỏi**: Chia sẻ vấn đề kèm phương pháp tư duy và tags phân loại.
-- **💬 Góp ý đa chiều**: Bình luận ẩn danh hoặc có tên, không cần đăng ký, không cần internet.
-- **🗳️ Voting & Giải quyết**: Ủng hộ bài viết hay, đánh dấu vấn đề đã có hướng đi.
-- **📦 Chia sẻ qua JSON**: Xuất/nhập toàn bộ dữ liệu cộng đồng để chia sẻ với nhóm khác.
-- **🎨 Hệ thống Đa giao diện**: Hiện đại (Glassmorphism) và Hoài cổ (Windows 98).
-- **🤖 Tối ưu Ollama**: Hỗ trợ timeout lên đến 5 phút, không bị lỗi "Timed Out".
+- **🎨 Hệ thống Đa giao diện (Multi-theme)**: Hỗ trợ chuyển đổi giữa giao diện Hiện đại (Glassmorphism) và giao diện Hoài cổ (Windows 98) ngay trong menu.
+- **🚀 Siêu tốc độ với Start.bat**: Khởi động Windows chỉ bằng 1 click.
+- **🤖 Tối ưu Ollama**: Hỗ trợ timeout lên đến 5 phút cho các dòng máy cấu hình thấp, đảm bảo không bị lỗi "Timed Out" khi sinh giải pháp dài.
+- **✨ Dọn dẹp câu trả lời**: Tự động loại bỏ và chuyển đổi các ký tự nhiễu LaTeX ($\rightarrow$, $\Rightarrow$) thành biểu tượng Unicode gọn gàng.
 
 ---
 

@@ -3,17 +3,15 @@
  * GitHub Pages compatible
  */
 
-const CACHE_NAME = 'tvt-v4.1.1';
+const CACHE_NAME = 'tvt-v2.0.0';
 const STATIC_ASSETS = [
   './',
   './index.html',
   './css/tvt.css',
-  './css/community.css',
   './js/models.js',
   './js/ai-providers.js',
   './js/tvt-core.js',
   './js/app.js',
-  './js/community.js',
   './manifest.json'
 ];
 

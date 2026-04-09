@@ -1,0 +1,20 @@
+app_name: "TVT - Tesla Visual Thinking"
+welcome: "Welcome to TVT!"
+menu:
+  choose_model: "Choose a thinking model:"
+  history: "Session History"
+  settings: "Settings"
+questions:
+  what: "What is the specific problem?"
+  why: "Why does it need to be solved? Context?"
+  who: "Who will use the results? Stakeholders?"
+  where: "Where does this apply? Environment?"
+  when: "When is the deadline? Timeline?"
+  how: "How do you plan to approach it?"
+messages:
+  min_words_warning: "⚠️ Please answer with at least {min_words} words."
+  research_required: "📝 Self-research task (required):"
+  analyzing: "🤖 TVT is analyzing..."
+  generating: "⚙️ Generating solutions..."
+  ask_follow_up: "There are a few points to clarify:"
+  done: "✅ Session completed."

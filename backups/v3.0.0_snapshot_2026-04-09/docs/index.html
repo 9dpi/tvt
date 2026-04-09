@@ -3,11 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TALKING WITH NIKOLA — TVT Community</title>
-  <meta name="description" content="Hệ thống tư duy cộng đồng mở · Phong cách Tesla · Offline-first · Không phụ thuộc AI">
+  <title>TALKING WITH NIKOLA</title>
+  <meta name="description" content="Hệ thống tư duy có cấu trúc · Phong cách Tesla · Offline-first">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
   <link rel="stylesheet" href="css/tvt.css">
-  <link rel="stylesheet" href="css/community.css">
 </head>
 <body>
 
@@ -16,57 +15,16 @@
   <!-- Title Bar -->
   <div class="xp-titlebar" id="titlebar">
     <span class="xp-title-icon">⚡</span>
-    <span class="xp-title-text" id="window-title">TESLA VISUAL THINKING — Cộng đồng Tư Duy</span>
+    <span class="xp-title-text" id="window-title">TALKING WITH NIKOLA</span>
     <div class="xp-controls">
       <button class="xp-btn close" id="btn-close" title="Khởi động lại trang" onclick="location.reload()">✕</button>
     </div>
   </div>
 
-  <!-- Body Split: 3 columns -->
+  <!-- Body Split -->
   <div class="xp-body-split">
-
-    <!-- ===  COMMUNITY PANEL (LEFT) === -->
-    <div class="xp-community-panel" id="community-panel">
-
-      <!-- Community Header -->
-      <div class="comm-panel-header">
-        <div class="comm-panel-title">
-          <span class="comm-panel-icon">🌐</span>
-          <span>Cộng đồng Tư Duy</span>
-        </div>
-        <div class="comm-panel-subtitle">Chia sẻ · Góp ý · Học hỏi</div>
-      </div>
-
-      <!-- Toolbar -->
-      <div class="comm-toolbar">
-        <button class="comm-tool-btn comm-tool-btn--primary" id="comm-btn-new" title="Đặt câu hỏi mới">
-          ✏️ Đặt câu hỏi
-        </button>
-        <div class="comm-toolbar-right">
-          <button class="comm-tool-btn" id="comm-btn-export" title="Xuất dữ liệu để chia sẻ">📤</button>
-          <button class="comm-tool-btn" id="comm-btn-import" title="Nhập dữ liệu từ cộng đồng khác">📥</button>
-          <input type="file" id="comm-import-file" accept=".json" style="display:none">
-        </div>
-      </div>
-
-      <!-- Search + Filter -->
-      <div class="comm-search-row">
-        <input type="text" id="comm-search" class="comm-search" placeholder="🔍 Tìm vấn đề...">
-        <select id="comm-filter" class="comm-filter">
-          <option value="all">Tất cả</option>
-          <option value="open">Đang thảo luận</option>
-          <option value="solved">Đã giải quyết</option>
-        </select>
-      </div>
-
-      <!-- Community Feed -->
-      <div id="community-feed" class="comm-feed">
-        <!-- Cards injected by community.js -->
-      </div>
-
-    </div> <!-- end community panel -->
-
-    <!-- === CHAT PANEL (CENTER) === -->
+    
+    <!-- === LEFT PANEL : CHAT (Scroll fixed inside) === -->
     <div class="xp-chat-panel">
       <!-- Chat header -->
       <div class="chat-header">
@@ -77,8 +35,6 @@
         </div>
         <div class="chat-toolbar">
           <button class="chat-tool-btn mobile-menu-btn" id="btn-mobile-menu" title="Menu">☰ Menu</button>
-          <button class="chat-tool-btn comm-toggle-btn" id="btn-comm-toggle" title="Cộng đồng">🌐</button>
-          <button class="chat-tool-btn" id="btn-buzz" title="Buzz!">🔔 BUZZ!</button>
           <button class="chat-tool-btn" id="btn-new-chat" title="Tạo phiên mới">➕ Phiên mới</button>
           <button class="chat-tool-btn" id="btn-download-json" title="Tải JSON">💾</button>
           <button class="chat-tool-btn" id="btn-download-md" title="Tải báo cáo MD">📄</button>
@@ -87,7 +43,7 @@
 
       <div class="xp-divider"></div>
 
-      <!-- Messages area -->
+      <!-- Messages area: Fixed height, isolated scrolling -->
       <div class="chat-messages-wrapper">
         <div id="chat-messages">
           <!-- Messages will be injected here -->
@@ -119,12 +75,12 @@
       </div>
     </div> <!-- end xp-chat-panel -->
 
-    <!-- === RIGHT PANEL : TASK PANE === -->
+    <!-- === RIGHT PANEL : WINDOWS XP TASK PANE === -->
     <div class="xp-side-panel">
       
       <!-- 1. AI Status & Settings -->
       <div class="xp-group">
-        <div class="xp-group-header">⚙️ Cài đặt &amp; Trạng thái AI</div>
+        <div class="xp-group-header">⚙️ Cài đặt & Trạng thái AI</div>
         <div class="xp-group-body">
           <div class="ai-status-row">
             <div class="status-dot checking" id="ai-status-dot"></div>
@@ -175,21 +131,10 @@
 <script src="js/ai-providers.js"></script>
 <script src="js/tvt-core.js"></script>
 <script src="js/app.js"></script>
-<script src="js/community.js"></script>
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
   }
-
-  // Init community panel after all modules load
-  window.addEventListener('DOMContentLoaded', () => {
-    CommunityUI.init();
-
-    // Toggle community panel on mobile
-    document.getElementById('btn-comm-toggle')?.addEventListener('click', () => {
-      document.getElementById('community-panel')?.classList.toggle('comm-panel--visible');
-    });
-  });
 </script>
 
 </body>
