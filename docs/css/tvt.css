@@ -357,11 +357,13 @@ body {
 /* ── Mobile responsive ────────────────────────────────────────── */
 @media (max-width: 650px) {
   body { padding: 0; align-items: flex-start; }
-  .xp-window { max-width: 100%; border-radius: 0; box-shadow: none; border: none; height: 100dvh; max-height: 100dvh; position: relative; overflow: hidden; }
+  .xp-window { width: 100%; max-width: 100%; border-radius: 0; box-shadow: none; border: none; height: 100dvh; max-height: 100dvh; position: relative; overflow: hidden; }
   .mobile-menu-btn { display: inline-flex; align-items: center; justify-content: center; }
   
-  .chat-header-name { font-size: 11px; }
-  .chat-header-sub { font-size: 9px; }
+  /* Hide Clutter on Mobile Header */
+  .chat-avatar { display: none; }
+  .chat-header-name { display: none; }
+  .chat-header-sub { font-size: 10px; font-weight: bold; }
   
   .xp-side-panel { 
     position: absolute;
