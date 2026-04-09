@@ -37,24 +37,55 @@ const AI_PROVIDERS = {
   },
 
   async _detectBestLogic() {
-    // 1. Try Ollama (local, completely free)
+    // 1. Try Ollama (local, default port 11434)
     try {
       const res = await fetch('http://localhost:11434/api/tags', {
-        signal: AbortSignal.timeout(2000)
+        signal: AbortSignal.timeout(1500)
       });
       if (res.ok) {
         const data = await res.json();
         const models = data.models || [];
-        const preferred = ['gemma3', 'gemma2', 'llama3', 'llama3.2', 'mistral', 'phi3', 'qwen'];
+        // Ưu tiên dòng Gemma (nhanh, 4B) và Llama (ổn định)
+        const preferred = ['gemma', 'llama', 'mistral', 'phi', 'qwen'];
         let chosenModel = null;
         for (const pref of preferred) {
-          const found = models.find(m => m.name.toLowerCase().startsWith(pref));
+          const found = models.find(m => m.name.toLowerCase().includes(pref));
           if (found) { chosenModel = found.name; break; }
         }
         if (!chosenModel && models.length > 0) chosenModel = models[0].name;
         if (chosenModel) {
           this._status = 'ollama';
           return { provider: 'ollama', model: chosenModel, free: true, local: true, label: `🖥️ Ollama (${chosenModel})` };
+        }
+      }
+    } catch (_) {}
+
+    // 1.1 Try LM Studio (Local, OpenAI-style on port 1234)
+    try {
+      const res = await fetch('http://localhost:1234/v1/models', {
+        signal: AbortSignal.timeout(1000)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const model = data.data?.[0]?.id;
+        if (model) {
+          this._status = 'lm-studio';
+          return { provider: 'groq', model, free: true, local: true, label: `🖥️ LM Studio (${model})`, baseUrl: 'http://localhost:1234/v1' };
+        }
+      }
+    } catch (_) {}
+
+    // 1.2 Try LocalAI (port 8080)
+    try {
+      const res = await fetch('http://localhost:8080/v1/models', {
+        signal: AbortSignal.timeout(1000)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const model = data.data?.[0]?.id;
+        if (model) {
+          this._status = 'local-ai';
+          return { provider: 'groq', model, free: true, local: true, label: `🖥️ LocalAI (${model})`, baseUrl: 'http://localhost:8080/v1' };
         }
       }
     } catch (_) {}
@@ -101,7 +132,7 @@ const AI_PROVIDERS = {
       case 'ollama':    return await this._callOllama(prompt, providerInfo.model);
       case 'chrome':    return await this._callChromeAI(prompt);
       case 'gemini':    return await this._callGemini(prompt);
-      case 'groq':      return await this._callGroq(prompt);
+      case 'groq':      return await this._callGroq(prompt, providerInfo);
       case 'openrouter':return await this._callOpenRouter(prompt);
       case 'offline':   
         if (prompt.includes('JSON')) return this._offlineAnalysis(prompt);
@@ -151,15 +182,19 @@ const AI_PROVIDERS = {
     return data.candidates[0].content.parts[0].text;
   },
 
-  async _callGroq(prompt) {
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+  async _callGroq(prompt, providerInfo) {
+    const baseUrl = providerInfo.baseUrl || 'https://api.groq.com/openai/v1';
+    const key = this._config.groqKey || 'none'; 
+    const model = this._config.groqModel || providerInfo.model || 'llama-3.3-70b-versatile';
+    
+    const res = await fetch(`${baseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this._config.groqKey}`
+        'Authorization': `Bearer ${key}`
       },
       body: JSON.stringify({
-        model: this._config.groqModel || 'llama-3.3-70b-versatile',
+        model: model,
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7
       }),
