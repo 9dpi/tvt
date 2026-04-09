@@ -265,7 +265,18 @@ const App = {
       this.updateProgress(100, 'Hoàn thành!');
       setTimeout(() => this.updateProgress(-1), 1000);
 
-      this.tvtSay(`📊 **Tóm tắt vấn đề của bạn:**\n${analysis.summary}`);
+      // Generate a simple ASCII mindmap of user inputs
+      const model = TVTCore.getModel();
+      let mindmapText = `**🧠 Sơ đồ tư duy của bạn (${model.name}):**\n\n`;
+      model.initial_questions.forEach(q => {
+        const answer = TVTCore.session.answers[q.id] || "Chưa có";
+        const shortAnswer = answer.length > 60 ? answer.substring(0, 57) + "..." : answer;
+        const branchSymbol = q === model.initial_questions[model.initial_questions.length - 1] ? '┗━' : '┣━';
+        mindmapText += `${branchSymbol} **${q.id.toUpperCase()}**: _${shortAnswer}_\n`;
+      });
+      
+      this.tvtSay(mindmapText);
+      this.tvtSay(`📊 **Phân tích của NIKOLA:**\n${analysis.summary}`);
 
       if (analysis.ambiguities?.length > 0) {
         const amb = analysis.ambiguities.map((a, i) => `${i + 1}. ${a}`).join('\n');
