@@ -16,15 +16,15 @@
 
 ---
 
-## ✨ Tính năng mới (v4.0) — Cộng đồng Tư Duy Mở
+## ✨ Tính năng mới (v4.1) — Cộng đồng & Hoài niệm
 
-- **🌐 Community Panel**: Cột trái hiển thị vấn đề cộng đồng đang thảo luận — công khai, minh bạch, ai cũng thấy.
+- **🌐 Community Panel**: Cột trái hiển thị vấn đề cộng đồng đang thảo luận — công khai, minh bạch.
 - **✏️ Đặt câu hỏi**: Chia sẻ vấn đề kèm phương pháp tư duy và tags phân loại.
-- **💬 Góp ý đa chiều**: Bình luận ẩn danh hoặc có tên, không cần đăng ký, không cần internet.
+- **💬 Yahoo Messenger Sounds**: Âm thanh nhận tin, gửi tin và **BUZZ!** kinh điển của Yahoo.
+- **🔔 BUZZ! Feature**: Nudge (rung màn hình) để thu hút sự chú ý, mang lại cảm giác hoài cổ.
+- **🎨 Windows 98 Theme**: Giao diện thống nhất màu Silver và Navy Blue, font Tahoma 13px cực kỳ dễ đọc.
 - **🗳️ Voting & Giải quyết**: Ủng hộ bài viết hay, đánh dấu vấn đề đã có hướng đi.
 - **📦 Chia sẻ qua JSON**: Xuất/nhập toàn bộ dữ liệu cộng đồng để chia sẻ với nhóm khác.
-- **🎨 Hệ thống Đa giao diện**: Hiện đại (Glassmorphism) và Hoài cổ (Windows 98).
-- **🤖 Tối ưu Ollama**: Hỗ trợ timeout lên đến 5 phút, không bị lỗi "Timed Out".
 
 ---
 

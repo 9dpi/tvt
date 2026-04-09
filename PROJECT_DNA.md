@@ -1,40 +1,34 @@
 # 🧬 Project DNA — Tesla Visual Thinking (TVT)
 
 ## 🎯 Tầm nhìn
-Xây dựng một hệ thống tư duy có cấu trúc, lấy cảm hứng từ nguyên lý cơ bản (First Principles) của Elon Musk, giúp người dùng phân rã các vấn đề phức tạp thành những phần tử hạt nhân để giải quyết triệt để.
+Xây dựng một hệ thống tư duy có cấu trúc, lấy cảm hứng từ nguyên lý cơ bản (First Principles) của Elon Musk, giúp người dùng phân rã các vấn đề phức tạp thành những phần tử hạt nhân. Từ phiên bản 4.0, TVT tiến hóa thành **Cộng đồng Tư Duy Mở (Open Community)** — nơi tri thức và phương pháp giải quyết vấn đề được chia sẻ minh bạch, đa chiều và không phụ thuộc vào AI.
 
 ## 🏗️ Kiến Trúc Hệ Thống (Architecture)
 
-### 1. Web Core (v3.0 - Hiện tại)
-- **Frontend native**: HTML5, Vanilla JavaScript, CSS3.
-- **UI/UX**: Hỗ trợ đa giao diện (Multi-theme). Bao gồm:
-    - **Hiện đại**: Clean, Mobile-first, Glassmorphism.
-    - **Windows 98**: Retro nostalgic, pixel perfect bevels.
-- **Offline-first**: Sử dụng Service Worker để cache toàn bộ ứng dụng, hoạt động không cần Internet.
-- **AI Orhcestration**: Logic điều phối AI nằm hoàn toàn ở client-side (`docs/js/ai-providers.js`).
+### 1. Web Core (v4.1 — Cộng đồng Tư Duy Mở)
+- **3-Column Layout**: 
+    - **Community (Left)**: Kho tri thức cộng đồng, offline-first.
+    - **Chat (Center)**: Không gian tương tác với Nikola AI hoặc tự tư duy.
+    - **Task/Settings (Right)**: Quản lý phương pháp và cấu hình.
+- **UI/UX**: Thống nhất giao diện **Windows 98 Retro** (Classic Silver, Navy Blue Titlebars, Tahoma 13px).
+- **Sound System**: Yahoo Messenger nostalgia (Receieve, Send, BUZZ!).
+- **Offline-first & Privacy**: Dữ liệu cộng đồng và cá nhân lưu hoàn toàn tại `localStorage`. Chia sẻ qua Import/Export JSON.
 
-### 2. Python Bridge (Legacy/CLI)
-- **CLI**: Công cụ dòng lệnh mạnh mẽ (`tvt/cli.py`).
-- **WebUI (Streamlit)**: Dashboard phân tích sâu (`tvt/webui/app.py`).
-- **Core Logic**: Bộ engine xử lý YAML models và LLM client đồng bộ (`tvt/core/`).
+### 2. AI & Logic Engine
+- **Decentralized AI**: Tích hợp Ollama (Local), Gemini, Groq (Cloud), và Chrome AI API.
+- **Offline Fallback**: Engine phân tích dựa trên cấu trúc câu hỏi logic khi không có kết nối AI.
 
-## 🤖 Chiến Lược AI (AI Strategy)
-Hệ thống ưu tiên quyền riêng tư và chi phí thấp thông qua mô hình phân tầng:
-1.  **Local LLM (Ollama)**: Ưu tiên số 1, bảo mật tuyệt đối, hoàn toàn miễn phí.
-2.  **Browser AI (Chrome API)**: Tận dụng sức mạnh xử lý ngay trên trình duyệt.
-3.  **Cloud AI (Gemini/Groq)**: Chỉ sử dụng khi cần hiệu suất cao, hỗ trợ Free Tier.
-4.  **Logic Engine (Offline)**: Bộ quy tắc tĩnh để phân tích cơ bản khi không có AI.
+## 📜 Nguyên Lý "DNA"
+1.  **Transparency (Minh bạch)**: Mọi vấn đề đều có thể công khai để nhận góp ý từ cộng đồng.
+2.  **Diverse Perspectives (Đa chiều)**: Khuyến khích mỗi người dùng mang đến một mô hình tư duy khác nhau cho cùng một vấn đề.
+3.  **No-AI Dependency**: Con người là trung tâm. AI chỉ đóng vai trò trợ lý tổng hợp và gợi ý.
+4.  **Zero Server**: Không backend, không database tập trung. Người dùng làm chủ hoàn toàn dữ liệu của mình.
 
 ## 🛠️ Stack Công Nghệ
-- **Web**: Vanilla JS, CSS Glassmorphism, Service Workers, PWA.
-- **Python**: Typer (CLI), Rich (Terminal UI), Streamlit (WebUI), PyYAML (Data).
-- **AI Tools**: Ollama, Google Generative AI SDK, Groq Cloud API.
-
-## 📜 Nguyên Lý Phát Triển
-1.  **Simple First**: Ưu tiên JavaScript thuần để tối ưu tốc độ và khả năng triển khai dễ dàng.
-2.  **Privacy First**: Không lưu trữ dữ liệu trên server, toàn bộ nằm ở local storage.
-3.  **Visual Thinking**: Biến các câu trả lời văn bản khô khan thành sơ đồ tư duy trực quan.
+- **Frontend**: Vanilla JS, CSS3, Service Workers (PWA).
+- **AI**: Ollama, Google AI SDK, Groq API.
+- **Storage**: Browser LocalStorage, JSON Serialization.
 
 ---
-*Cập nhật lần cuối: 2026-04-09 | Version 3.0.0 (Stable)*
-*Lộ trình tiếp theo: [CHECKPOINT_V4.0_PLANNING.md](file:///d:/Automator_Prj/Tesla%20Visual%20Thinking%20-%20TVT/CHECKPOINT_V4.0_PLANNING.md)*
+*Cập nhật lần cuối: 2026-04-09 | Version 4.1.1 (Community Release)*
+*Checkpoint chi tiết: [CHECKPOINT_V4.1.md](file:///d:/Automator_Prj/Tesla%20Visual%20Thinking%20-%20TVT/CHECKPOINT_V4.1.md)*
