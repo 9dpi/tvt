@@ -3,7 +3,7 @@
  * GitHub Pages compatible
  */
 
-const CACHE_NAME = 'tvt-v1';
+const CACHE_NAME = 'tvt-v2.0.0';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -45,17 +45,19 @@ self.addEventListener('fetch', event => {
     return; // Let browser handle normally
   }
 
-  // Static assets: cache-first
+  // Static assets: Network-first, fallback to cache
   event.respondWith(
-    caches.match(event.request).then(cached => {
+    fetch(event.request).then(response => {
+      if (response && response.ok) {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+      }
+      return response;
+    }).catch(async () => {
+      // Offline fallback
+      const cached = await caches.match(event.request);
       if (cached) return cached;
-      return fetch(event.request).then(response => {
-        if (response.ok) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
-        }
-        return response;
-      }).catch(() => caches.match('./index.html'));
+      return caches.match('./index.html');
     })
   );
 });
