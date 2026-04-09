@@ -1,0 +1,20 @@
+app_name: "TVT - Tesla Visual Thinking"
+welcome: "Chào mừng bạn đến với TVT!"
+menu:
+  choose_model: "Chọn phương pháp tư duy:"
+  history: "Lịch sử phiên"
+  settings: "Cài đặt"
+questions:
+  what: "Vấn đề cụ thể là gì?"
+  why: "Tại sao cần giải quyết? Bối cảnh?"
+  who: "Ai sẽ dùng kết quả? Đối tượng liên quan?"
+  where: "Môi trường, phạm vi áp dụng?"
+  when: "Thời gian, lịch trình, deadline?"
+  how: "Bạn đã nghĩ đến cách tiếp cận nào chưa?"
+messages:
+  min_words_warning: "⚠️ Vui lòng trả lời ít nhất {min_words} từ."
+  research_required: "📝 Nhiệm vụ tự tìm kiếm (bắt buộc):"
+  analyzing: "🤖 TVT đang phân tích..."
+  generating: "⚙️ Đang tổng hợp giải pháp..."
+  ask_follow_up: "Có một vài điểm cần làm rõ:"
+  done: "✅ Đã hoàn thành phiên làm việc."
